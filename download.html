@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target='_top'>
+    <script type='text/javascript'>    
+      window.onload = function(){
+        handleDownload();
+      }
+      function handleDownload() {
+        // obtain CSV data via GAS
+        var content = <?= getCsvData(); ?>;
+        var bom  = new Uint8Array([0xEF, 0xBB, 0xBF]);
+        var blob = new Blob([bom, content], { 'type': 'text/csv'});
+        var link = document.createElement('a');
+        // obtain file name via GAS
+        link.download = <?= getFileName(); ?>;
+        // attempt to download
+        link.href = window.URL.createObjectURL(blob);
+        link.target = '_blank';
+        link.rel = 'noreferrer';
+        link.click();
+        // close browser tab automatically
+        setTimeout(function(){ window.top.close(); }, 3000);
+      }
+  </script>
+  </head>
+  <body>
+    <h2>Pathos 日本語 Translation</h2>
+    <p>間もなくデータがダウンロードされます... このウィンドウは3秒後に自動的に閉じます。</p>
+  </body>
+</html>

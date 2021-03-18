@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Language" content="ja">
+    <title>Pathos 日本語 Translation Helper</title>
+    <style>
+      table {
+        border-collapse: collapse;
+      }
+      table, th, td {
+        border: 1px solid #bbbbbb;
+      }
+      th, td {
+        font-weight: normal;
+        padding: 0.2em;
+        font-size: 14px;
+      }
+      .warn {
+        color: red;
+      }
+      .line {
+        text-align: right;
+      }
+    </style>
+    <script type='text/javascript'>    
+      window.onload = function(){
+        var mode = <?= getMode(); ?>;
+        if (mode == '2') document.getElementById('provisional').hidden = false;
+        var data = JSON.parse(<?= checkDuplicates(); ?>);
+        document.getElementById('result').hidden = false;
+        for(var i=0; i<data.length; i++) {
+          var tr = document.createElement('tr');
+          var isCritical = /Name$/.test(data[i][1]) && data[i][1] != 'ClassName' && data[i][1] != 'RaceName';
+          for(var j=0; j<4; j++){
+            var td = document.createElement('td');
+            td.append(data[i][j]);
+            if(isCritical) td.setAttribute('class', 'warn');
+            tr.append(td);
+          }
+          document.getElementById('result-table').append(tr);
+        }
+        document.getElementById('checking').hidden = true;
+      }
+    </script>
+  </head>
+  <body>
+    <h2>Pathos 日本語 Translation</h2>
+    <div id="provisional" hidden>【暫定版】</div>
+    <div id="checking">チェック中...</div>
+    <div id="no-result" hidden>チェックしましたが重複する項目はありませんでした。もしかするとチェック処理が正しく動作していないかも知れません。</div>
+    <div id="result" hidden>項目重複、ヨシ!!<br/>
+      <table id="result-table">
+        <tr>
+          <th>line</th>
+          <th>concept</th>
+          <th>original</th>
+          <th>translation</th>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>
