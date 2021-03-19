@@ -112,8 +112,7 @@ function buildDictionaryWithNumber(inputArray, outputArray) {
 
 function buildDictionaryProvisional(inputArray, outputArray) {
   if (inputArray[3] == '') {
-    // TODO 『』有りを提出したらreplaceメソッドを削る
-    outputArray.push(inputArray[1].concat(',', treatQuot(inputArray[2]), ',', treatQuot(inputArray[4].replace(/[『,』]/g,''))));
+    outputArray.push(inputArray[1].concat(',', treatQuot(inputArray[2]), ',', treatQuot(inputArray[4])));
   } else {
     outputArray.push(inputArray[1].concat(',', treatQuot(inputArray[2]), ',', treatQuot(inputArray[3])));
   }
