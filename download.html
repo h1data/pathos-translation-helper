@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <base target='_top'>
-    <script type='text/javascript'>    
-      window.onload = function(){
-        handleDownload();
-      }
-      function handleDownload() {
+    <title><?= text.title; ?></title>
+    <base target="_top">
+    <script type="text/javascript">
+      window.onload = function() {
         // obtain CSV data via GAS
         var content = <?= getCsvData(); ?>;
         var bom  = new Uint8Array([0xEF, 0xBB, 0xBF]);
@@ -25,7 +23,7 @@
   </script>
   </head>
   <body>
-    <h2>Pathos 日本語 Translation</h2>
-    <p>間もなくデータがダウンロードされます... このウィンドウは3秒後に自動的に閉じます。</p>
+    <h2><?= text.title; ?></h2>
+    <p><?= text.download.message; ?></p>
   </body>
 </html>

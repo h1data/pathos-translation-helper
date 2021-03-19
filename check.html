@@ -4,7 +4,7 @@
     <base target="_top">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="Content-Language" content="ja">
-    <title>Pathos 日本語 Translation Helper</title>
+    <title><?= text.title; ?></title>
     <style>
       table {
         border-collapse: collapse;
@@ -24,11 +24,11 @@
         text-align: right;
       }
     </style>
-    <script type='text/javascript'>    
+    <script type="text/javascript">
       window.onload = function(){
         var mode = <?= getMode(); ?>;
         if (mode == '2') document.getElementById('provisional').hidden = false;
-        var data = JSON.parse(<?= checkDuplicates(); ?>);
+        var data = JSON.parse('<?= checkDuplicates(); ?>');
         document.getElementById('result').hidden = false;
         for(var i=0; i<data.length; i++) {
           var tr = document.createElement('tr');
@@ -46,11 +46,11 @@
     </script>
   </head>
   <body>
-    <h2>Pathos 日本語 Translation</h2>
-    <div id="provisional" hidden>【暫定版】</div>
-    <div id="checking">チェック中...</div>
-    <div id="no-result" hidden>チェックしましたが重複する項目はありませんでした。もしかするとチェック処理が正しく動作していないかも知れません。</div>
-    <div id="result" hidden>項目重複、ヨシ!!<br/>
+    <h2><?= text.title; ?></h2>
+    <div id="provisional" hidden><?= text.check.provisional; ?></div>
+    <div id="checking"><?= text.check.checking; ?></div>
+    <div id="no-result" hidden><?= text.check.noResult; ?></div>
+    <div id="result" hidden><?= text.check.normal; ?><br/>
       <table id="result-table">
         <tr>
           <th>line</th>

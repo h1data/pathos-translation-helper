@@ -1,10 +1,19 @@
+// the normal response http file 
+const responseHttp = 'download.html';
+
+// the error response http file for illegal arguments
+const errorHttp = 'error.html';
+
+// the check result http file
+const checkHttp = 'check.html';
+
 // 0=dictionary, 1=guides, 2=duplicate check
 var type__ = '9';
 
 // 0=normal, 1=with line number, 2=provisional
 var mode__ = '9';
 
-// ID of spreadsheet : xxx...xxx of https://docs.google.com/spreadsheets/d/xxx...xxx/
+// ID of spreadsheet
 var id__ = '';
 
 // functions to build CSV data
