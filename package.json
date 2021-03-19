@@ -1,7 +1,7 @@
 {
   "name": "main",
   "version": "1.0.0",
-  "description": "* Pathos Translation Helper",
+  "description": "Pathos Translation Helper",
   "main": "Code.js",
   "dependencies": {
     "@types/google-apps-script": "^1.0.28"
