@@ -1,19 +1,19 @@
 // message
 const text = {
-  title: 'Pathos Translation Helper',
+  title: 'Pathos 日本語 Translation Helper',
   download : {
-    message: 'The file will be downloaded soon and this window will close automatically.'
+    message: '間もなくデータがダウンロードされます... このウィンドウは自動的に閉じます。'
   },
   check : {
-    checking: 'checking...',
-    normal: 'Belows are duplicated.',
-    noResult: 'Checked but no duplication was found. Perhaps check function does not work properly.',
-    provisional: '[provisional]'
+    checking: 'チェック中...',
+    normal: '項目重複、ヨシ!!!!',
+    noResult: 'チェックしましたが重複する項目はありませんでした。もしかするとチェック処理が正しく動作していないかも知れません。',
+    provisional: '【暫定版】'
   }
 };
 
 // the input sheet names for each type (dictionary, guides)
-const sheetNames = ['dictionary', 'guides'];
+const sheetNames = ['入力用', 'ガイド入力用'];
 
 // file names for each type and mode
 const fileNames = [
