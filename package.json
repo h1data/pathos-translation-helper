@@ -1,0 +1,15 @@
+{
+  "name": "main",
+  "version": "1.0.0",
+  "description": "* Pathos Translation Helper",
+  "main": "Code.js",
+  "dependencies": {
+    "@types/google-apps-script": "^1.0.28"
+  },
+  "devDependencies": {},
+  "scripts": {
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
