@@ -2,10 +2,10 @@
 <html>
   <head>
     <base target="_top">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Type" content="script/html; charset=utf-8">
     <meta http-equiv="Content-Language" content="ja">
     <title><?= text.title; ?></title>
-    <?!= HtmlService.createHtmlOutputFromFile('style').getContent(); ?>
+    <?!= HtmlService.createHtmlOutputFromFile('html/style').getContent(); ?>
     <script type="text/javascript">
       window.onload = function(){
         var mode = <?= getMode(); ?>;
