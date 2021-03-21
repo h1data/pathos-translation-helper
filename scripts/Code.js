@@ -1,11 +1,11 @@
 // the normal response http file 
-const responseHttp = 'download.html';
+const responseHttp = 'html/download.html';
 
 // the error response http file for illegal arguments
-const errorHttp = 'error.html';
+const errorHttp = 'html/error.html';
 
 // the check result http file
-const checkHttp = 'check.html';
+const checkHttp = 'html/check.html';
 
 // 0=dictionary, 1=guides, 2=duplicate check
 var type__ = '9';
