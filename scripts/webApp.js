@@ -65,6 +65,11 @@ function getFileName() {
   }
 }
 
+// obtain output type
+function getType() {
+  return type__;
+}
+
 // obtain output mode
 function getMode() {
   return mode__;
