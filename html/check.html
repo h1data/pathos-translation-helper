@@ -13,8 +13,7 @@
         if (mode == '2') document.getElementById('provisional').hidden = false;
         google.script.run
           .withSuccessHandler(
-            function (result) {
-              var data = JSON.parse(result);
+            function (data) {
               document.getElementById('result').hidden = false;
               if (data.size == 0) {
                 document.getElementById('message').innerHTML = <?= text.check.noResult; ?>;

@@ -57,5 +57,5 @@ function checkDuplicates(id, mode) {
       outputArray.push(output);
     }
   }
-  return JSON.stringify(outputArray);
+  return outputArray;
 }
