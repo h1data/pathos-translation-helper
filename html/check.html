@@ -8,31 +8,41 @@
     <?!= HtmlService.createHtmlOutputFromFile('html/style').getContent(); ?>
     <script type="text/javascript">
       window.onload = function(){
+        var id = <?= getId(); ?>;
         var mode = <?= getMode(); ?>;
         if (mode == '2') document.getElementById('provisional').hidden = false;
-        var data = JSON.parse('<?= checkDuplicates(); ?>');
-        document.getElementById('result').hidden = false;
-        for(var i=0; i<data.length; i++) {
-          var tr = document.createElement('tr');
-          var isCritical = /Name$/.test(data[i][1]) && data[i][1] != 'ClassName' && data[i][1] != 'RaceName';
-          for(var j=0; j<4; j++){
-            var td = document.createElement('td');
-            td.append(data[i][j]);
-            if(isCritical) td.setAttribute('class', 'warn');
-            tr.append(td);
-          }
-          document.getElementById('result-table').append(tr);
-        }
-        document.getElementById('checking').hidden = true;
+        google.script.run
+          .withSuccessHandler(
+            function (result) {
+              var data = JSON.parse(result);
+              document.getElementById('result').hidden = false;
+              if (data.size == 0) {
+                document.getElementById('message').innerHTML = <?= text.check.noResult; ?>;
+                return;
+              }
+              for(var i=0; i<data.length; i++) {
+                var tr = document.createElement('tr');
+                var isCritical = /Name$/.test(data[i][1]) && data[i][1] != 'ClassName' && data[i][1] != 'RaceName';
+                for(var j=0; j<4; j++){
+                  var td = document.createElement('td');
+                  td.append(data[i][j]);
+                  if(isCritical) td.setAttribute('class', 'warn');
+                  tr.append(td);
+                }
+                document.getElementById('result-table').append(tr);
+              }
+              document.getElementById('message').innerHTML = <?= text.check.normal; ?>;
+            }
+          )
+          .checkDuplicates(id, mode);
       }
     </script>
   </head>
   <body>
     <h2><?= text.title; ?></h2>
     <div id="provisional" hidden><?= text.check.provisional; ?></div>
-    <div id="checking"><?= text.check.checking; ?></div>
-    <div id="no-result" hidden><?= text.check.noResult; ?></div>
-    <div id="result" hidden><?= text.check.normal; ?><br/>
+    <div id="message"><?= text.check.checking; ?></div>
+    <div id="result" hidden>
       <table id="result-table">
         <tr>
           <th>line</th>

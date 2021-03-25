@@ -2,7 +2,8 @@
 const text = {
   title: 'Pathos Translation Helper',
   download : {
-    message: 'The file will be downloaded soon and this window will close automatically.'
+    loading: 'loading...',
+    message: 'The download data is ready to download. This windows will be closed automatically'
   },
   check : {
     checking: 'checking...',
