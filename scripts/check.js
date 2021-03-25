@@ -5,10 +5,10 @@ const keyMap =
   };
 
 // output data duplicate lines in JSON
-function checkDuplicates() {
+function checkDuplicates(id, mode) {
   console.log('checkDuplicates');
   let sheetName = sheetNames[0];  // fixed to dictionary
-  let inputArray = SpreadsheetApp.openById(id__).getSheetByName(sheetName).getDataRange().getValues();
+  let inputArray = SpreadsheetApp.openById(id).getSheetByName(sheetName).getDataRange().getValues();
   let midArray = new Array();
   let counts = {};
   let outputArray = new Array();
@@ -19,7 +19,7 @@ function checkDuplicates() {
     if (keyMap[inputArray[i][1]] === undefined) {
       key = inputArray[i][1];
     }
-    if (mode__ == '0') {  // normal
+    if (mode == '0') {  // normal
       if (inputArray[i][4] == '') {
         output = [inputArray[i][0], inputArray[i][1], inputArray[i][2], inputArray[i][3]];
         key += inputArray[i][3];
