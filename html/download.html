@@ -5,30 +5,41 @@
     <base target="_top">
     <script type="text/javascript">
       window.onload = function() {
+        var id = <?= getId(); ?>;
+        var type = <?= getType(); ?>;
+        var mode = <?= getMode(); ?>;
         // obtain CSV data via GAS
-        var content = <?= getCsvData(); ?>;
-        if (<?= getType() ?> == '0') {
-          // prepend BOM only for Dictionary file
-          var blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]),
-                               content], {'type': 'text/csv'});
-        } else {
-          var blob = new Blob([content], {'type': 'text/csv'});
-        }
-        var link = document.createElement('a');
-        // obtain file name via GAS
-        link.download = <?= getFileName(); ?>;
-        // attempt to download
-        link.href = window.URL.createObjectURL(blob);
-        link.target = '_blank';
-        link.rel = 'noreferrer';
-        link.click();
-        // close browser tab automatically
-        setTimeout(function(){ window.top.close(); }, 3000);
+        google.script.run
+          .withSuccessHandler(
+            function(content) {
+              console.log('download data online');
+              if (type == '0') {
+                // prepend BOM only for Dictionary file
+                var blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]),
+                                   content], {'type': 'text/csv'});
+              } else {
+                var blob = new Blob([content], {'type': 'text/csv'});
+              }
+              document.getElementById('message').innerHTML = <?= text.download.message; ?>;
+              console.log('...');
+              var link = document.createElement('a');
+              // obtain file name via GAS
+              link.download = <?= getFileName(); ?>;
+              // attempt to download
+              link.href = window.URL.createObjectURL(blob);
+              link.target = '_blank';
+              link.rel = 'noreferrer';
+              link.click();
+              // close browser tab automatically
+              setTimeout(function(){ window.top.close(); }, 1000);
+            }
+          )
+          .getCsvData(id, type, mode);
       }
   </script>
   </head>
   <body>
     <h2><?= text.title; ?></h2>
-    <p><?= text.download.message; ?></p>
+    <div id="message"><?= text.download.loading; ?></p>
   </body>
 </html>

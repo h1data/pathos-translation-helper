@@ -6,14 +6,14 @@ const buildFunctions =
   ];
 
 // generates download data
-function getCsvData() {
+function getCsvData(id, type, mode) {
   // the input sheet name to be referenced
-  let sheetName = sheetNames[type__];
+  let sheetName = sheetNames[type];
   
   // define function to generate data per line
-  let buildFunction = buildFunctions[type__][mode__];
+  let buildFunction = buildFunctions[type][mode];
   
-  var inputArray = SpreadsheetApp.openById(id__).getSheetByName(sheetName).getDataRange().getValues();
+  var inputArray = SpreadsheetApp.openById(id).getSheetByName(sheetName).getDataRange().getValues();
   var outputArray = [];
   // line 1 is the header thus loop begins from line 2 (i=0)
   for (let i = 1; i < inputArray.length; i++) {

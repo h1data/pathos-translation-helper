@@ -2,7 +2,8 @@
 const text = {
   title: 'Pathos 日本語 Translation Helper',
   download : {
-    message: '間もなくデータがダウンロードされます... このウィンドウは自動的に閉じます。'
+    loading: 'データ作成中...',
+    message: 'データ作成が完了しました。このウィンドウは自動的に閉じます。'
   },
   check : {
     checking: 'チェック中...',
