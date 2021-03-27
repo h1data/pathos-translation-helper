@@ -20,16 +20,21 @@
               } else {
                 var blob = new Blob([content], {'type': 'text/csv'});
               }
+              var fileName = <?= getFileName(); ?>;
               document.getElementById('message').innerHTML = <?= text.download.message; ?>;
-              console.log('...');
-              var link = document.createElement('a');
-              // obtain file name via GAS
-              link.download = <?= getFileName(); ?>;
-              // attempt to download
-              link.href = window.URL.createObjectURL(blob);
-              link.target = '_blank';
-              link.rel = 'noreferrer';
-              link.click();
+              if (window.navigator.msSaveBlob) {
+                // IE or Edge
+                window.navigator.msSaveBlob(blob, filename);
+              } else {
+                var link = document.createElement('a');
+                // obtain file name via GAS
+                link.download = fileName;
+                // attempt to download
+                link.href = window.URL.createObjectURL(blob);
+                link.target = '_blank';
+                link.rel = 'noreferrer';
+                link.click();
+              }
               // close browser tab automatically
               setTimeout(function(){ window.top.close(); }, 1000);
             }
@@ -40,6 +45,6 @@
   </head>
   <body>
     <h2><?= text.title; ?></h2>
-    <div id="message"><?= text.download.loading; ?></p>
+    <div id="message"><?= text.download.loading; ?></div>
   </body>
 </html>
