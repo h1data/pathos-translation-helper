@@ -16,12 +16,12 @@
               if (type == '0') {
                 // prepend BOM only for Dictionary file
                 var blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]),
-                                   content], {'type': 'text/csv'});
+                                   content], {'type': 'text/plain'});
               } else {
-                var blob = new Blob([content], {'type': 'text/csv'});
+                var blob = new Blob([content], {'type': 'text/plain'});
               }
               var fileName = <?= getFileName(); ?>;
-              document.getElementById('message').innerHTML = <?= text.download.message; ?>;
+              document.getElementById('message').textContent = <?= text.download.message; ?>;
               if (window.navigator.msSaveBlob) {
                 // IE or Edge
                 window.navigator.msSaveBlob(blob, filename);
