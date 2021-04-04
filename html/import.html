@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title><?= text.title; ?></title>
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <?!= HtmlService.createHtmlOutputFromFile('html/style').getContent(); ?>
+    <script type="text/javascript">
+      var inpLoadButton;
+      var inpFile;
+      var inpExecute;
+      var inpReturn;
+      var divMessage;
+      var divChanges;
+      var mode;
+      var diffData;
+      const id = '<?= getId(); ?>';
+      window.onload = function() {
+        inpFile = document.getElementById('file');
+        inpFile.addEventListener('change', checkFileName, false);
+        inpExecute = document.getElementById('executeButton');
+        inpReturn = document.getElementById('returnButton');
+        inpLoadButton = document.getElementById('loadButton');
+        divMessage = document.getElementById('message');
+        divChanges = document.getElementById('changes');
+      }
+      function checkFileName() {
+        const selectedFile = inpFile.files[0];
+        if (selectedFile.name == 'ja.Dictionary') {
+          mode = 1;
+        } else if (selectedFile.name == 'ja.Guides') {
+          mode = 2;
+        } else {
+          divMessage.textContent = '<?= text.import.illegalFileName; ?>';
+          return;
+        }
+        divMessage.textContent = '<?= text.import.fileSelected; ?>';
+        inpLoadButton.removeAttribute('disabled');
+      }
+      function loadFile() {
+        console.log('load button pressed');
+        const selectedFile = inpFile.files[0];
+        inpFile.setAttribute('disabled', true);
+        inpLoadButton.setAttribute('disabled', true);
+        let fileReader = new FileReader();
+        fileReader.onload = function(e) {
+          google.script.run
+            .withSuccessHandler(displayDiff)
+            .withFailureHandler(
+              function(arg) {
+                inpFile.removeAttribute('disabled');
+                divMessage.textContent = '<?= text.import.fileLoadFailed; ?>';
+              }
+            )
+            .loadFile(id, selectedFile.name, e.target.result);
+        };
+        divMessage.textContent = '<?= text.import.loading; ?>';
+        fileReader.readAsText(selectedFile);
+      }
+
+      function displayDiff(arg) {
+        diffData = arg;
+        if (diffData == -1) {
+          divMessage.textContent = '<?= text.import.illegalFileFormat; ?>';
+          inpFile.removeAttribute('disabled');
+          return;
+        }
+        if (diffData.length == 0) {
+          divMessage.textContent = '<?= text.import.noChange; ?>';
+          inpFile.removeAttribute('disabled');
+          return;
+        }
+        while (document.getElementById('diffTable').firstChild) {
+          document.getElementById('diffTable').removeChild(document.getElementById('diffTable').firstChild);
+        }
+        let tr = document.createElement('tr');
+        const header = ['mod', 'line', 'concept', 'original', 'translation'];
+        for (let i=0; i<5; i++) {
+          if (i == 2 && mode == 2) continue;
+          let th = document.createElement('th');
+          th.append(header[i]);
+          if (i == 1) {
+            th.setAttribute('colspan', 2);
+            th.setAttribute('class', 'line');
+          }
+          tr.append(th);
+        }
+        document.getElementById('diffTable').append(tr);
+        
+        divChanges.removeAttribute('hidden');
+        for (let i=0; i<diffData.length; i++) {
+          let tr = document.createElement('tr');
+          for (let j=0; j<diffData[i].length; j++) {
+            let td = document.createElement('td');
+            td.append(diffData[i][j]);
+            if (diffData[i][j] == 'add') {
+              td.setAttribute('class', 'red');
+            } else if (diffData[i][j] == 'del') {
+              td.setAttribute('class', 'blue');
+            }
+            if (j == 1 || j == 2) td.setAttribute('class', 'line');
+            tr.append(td);
+          }
+          document.getElementById('diffTable').append(tr);
+        }
+        divMessage.textContent = '<?= text.import.differenceConfirm; ?>';
+        inpExecute.removeAttribute('disabled');
+        inpReturn.removeAttribute('disabled');
+      }
+
+      function execute() {
+        divMessage.textContent = '<?= text.import.updating; ?>';
+        inpExecute.setAttribute('disabled', 'true');
+        inpReturn.setAttribute('disabled', 'true');
+        const selectedFile = inpFile[0];
+        google.script.run
+          .withSuccessHandler(
+            function(arg) {
+              divMessage.textContent = '<?= text.import.updated; ?>';
+              inpReturn.removeAttribute('disabled');
+            }
+          )
+          .withFailureHandler(
+            function(arg) {
+              divMessage.textContent = '<?= text.import.updateFailed; ?>';
+              inpReturn.removeAttribute('disabled');
+            }
+          )
+          .applyData(mode, id, diffData, inpFile.files[0].lastModified);
+      }
+
+      function returnFileSelect() {
+        divMessage.textContent = '';
+        inpFile.removeAttribute('disabled');
+        inpLoadButton.removeAttribute('disabled');
+        divChanges.setAttribute('hidden', true);
+      }
+    </script>
+  </head>
+  <body>
+    <div class="main">
+      <h2><?= text.title; ?></h2>
+      <div id="load">
+        <input type="file" id="file" class="file" accept=".Dictionary,.Guides" />
+        <input type="button" id="loadButton" class="action" value="<?= text.import.loadButton; ?>" onclick="loadFile()" disabled="true" />
+      </div>
+      <p id="message"><?= text.import.initialMessage; ?></p>
+      <div id="changes" hidden>
+        <p>
+          <input type="button" id="executeButton" value="<?= text.import.executeButton; ?>" class="create" onclick="execute()" />
+          <input type="button" id="returnButton" value="<?= text.import.returnButton; ?>" onclick="returnFileSelect()" />
+        </p>
+        <table id="diffTable"></table>
+      </div>
+      <p class="secondary">Portions of this page are reproduced from work created and
+        <a href="https://developers.google.com/terms/site-policies" target="_blank">shared by Google</a>
+        and used according to terms described in the
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons 4.0 Attribution License</a>.
+      </p>
+    </div>
+  </body>
+</html>

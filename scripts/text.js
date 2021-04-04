@@ -3,13 +3,32 @@ const text = {
   title: 'Pathos 日本語 Translation Helper',
   download : {
     loading: 'データ作成中...',
-    message: 'データ作成が完了しました。このウィンドウは自動的に閉じます。'
+    message: 'データ作成が完了しました。このウィンドウは閉じても構いません。'
   },
   check : {
     checking: 'チェック中...',
     normal: '項目重複、ヨシ!!!!',
     noResult: 'チェックしましたが重複する項目はありませんでした。もしかするとチェック処理が正しく動作していないかも知れません。',
     provisional: '【暫定版】'
+  },
+  import : {
+    initialMessage: 'ja.Dictionary または ja.Guides ファイルを選択し、読み込みボタンを押してください。',
+    loadButton: '読み込み',
+    executeButton: '実行!!',
+    returnButton: 'ファイル選択に戻る',
+    illegalFileName: 'ファイル名が不正です。ja.Dictionary または ja.Guides ファイルを選択してください。',
+    fileSelected: '読み込みボタンを押すと、ファイルを読み込んで変更箇所を表示します。',
+    fileLoadFailed: 'ファイルの読み込みに失敗しました。',
+    loading: '読み込み中...',
+    illegalFileFormat: 'ファイル形式が不正です。他のファイルを選択してください。',
+    noChange: '変更点は今のところありません。',
+    differenceConfirm: '下記の変更点があります。シートへ反映しますか？',
+    updating: 'シートへ反映中...',
+    updated: 'シートへの反映が完了しました。',
+    updateFailed: 'シートへの反映に失敗しました。',
+    header: 'mod,line,concept,original,translation',
+    addDateComment: function(date) { return date + '追加'; },
+    memoColumn: [11, 8]
   }
 };
 
