@@ -1,12 +1,11 @@
-// table to convert above multiple concepts
-const keyMap =
-  {
-    "AppearanceName": "ItemName",
-  };
-
 // output data duplicate lines in JSON
 function checkDuplicates(id, mode) {
   console.log('checkDuplicates');
+  // table to convert above multiple concepts
+  const keyMap =
+  {
+    "AppearanceName": "ItemName",
+  };
   const sheet = SpreadsheetApp.openById(id).getSheetByName(sheetNames[0]);
   const inputArray = sheet.getRange(2, 1, sheet.getLastRow()-1, 5).getValues();
   const midArray = new Array();
