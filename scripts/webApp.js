@@ -1,4 +1,4 @@
-// 0=dictionary, 1=guides, 2=duplicate check, 3=upload
+// 0=dictionary, 1=guides, 2=duplicate check, 3=uploader
 var type__ = '9';
 
 // 0=normal, 1=with line number, 2=provisional
@@ -13,9 +13,9 @@ function doGet(e){
   try {
     id__ = e.parameters.id.toString();
     type__ = e.parameters.type.toString();
-    // if(type__ != '3') {
-    mode__ = e.parameters.mode.toString();
-    // }
+    if(type__ != '3') {
+      mode__ = e.parameters.mode.toString();
+    }
   } catch(exception) {
     console.error(exception);
     return HtmlService.createTemplateFromFile('html/error.html').evaluate();
@@ -25,8 +25,8 @@ function doGet(e){
       return HtmlService.createTemplateFromFile('html/download.html').evaluate();
     } else if (type__ == '2') {
       return HtmlService.createTemplateFromFile('html/check.html').evaluate();
-    // } else if (type__ == '3') {
-    //   return HtmlService.createTemplateFromFile('html/import.html').evaluate();
+    } else if (type__ == '3') {
+      return HtmlService.createTemplateFromFile('html/import.html').evaluate();
     }
   } else {
     return HtmlService.createTemplateFromFile('html/error.html').evaluate();
@@ -45,8 +45,8 @@ function checkParameters() {
     return true;
   } else if (type__ == '2' && (mode__ == '0' || mode__ == '2') ) {
     return true;
-//  } else if (type__ == '3') {
-//    return true;
+ } else if (type__ == '3') {
+   return true;
   } else {
     console.error('illegal arguments');
     return false;
