@@ -75,7 +75,7 @@
           document.getElementById('diffTable').removeChild(document.getElementById('diffTable').firstChild);
         }
         let tr = document.createElement('tr');
-        const header = ['mod', 'line', 'concept', 'original', 'translation'];
+        const header = '<?= text.import.header ?>'.split(',');
         for (let i=0; i<5; i++) {
           if (i == 2 && mode == 2) continue;
           let th = document.createElement('th');
@@ -93,11 +93,16 @@
           let tr = document.createElement('tr');
           for (let j=0; j<diffData[i].length; j++) {
             let td = document.createElement('td');
-            td.append(diffData[i][j]);
-            if (diffData[i][j] == 'add') {
-              td.setAttribute('class', 'red');
-            } else if (diffData[i][j] == 'del') {
-              td.setAttribute('class', 'blue');
+            if (j == 0) {
+              if (diffData[i][j] == 'add') {
+                td.append('<?= text.import.add; ?>');
+                td.setAttribute('class', 'red');
+              } else if (diffData[i][j] == 'del') {
+                td.append('<?= text.import.del; ?>');
+                td.setAttribute('class', 'blue');
+              }
+            } else {
+              td.append(diffData[i][j]);
             }
             if (j == 1 || j == 2) td.setAttribute('class', 'line');
             tr.append(td);
@@ -131,7 +136,7 @@
       }
 
       function returnFileSelect() {
-        divMessage.textContent = '';
+        divMessage.textContent = '<?= text.import.fileSelected; ?>';
         inpFile.removeAttribute('disabled');
         inpLoadButton.removeAttribute('disabled');
         divChanges.setAttribute('hidden', true);

@@ -26,7 +26,9 @@ const text = {
     updating: 'シートへ反映中...',
     updated: 'シートへの反映が完了しました。',
     updateFailed: 'シートへの反映に失敗しました。',
-    header: 'mod,line,concept,original,translation',
+    header: '変更,行番号,項目,原文,訳',
+    add: '追加',
+    del: '削除',
     addDateComment: function(date) { return date + '追加'; },
     memoColumn: [11, 8]
   }
