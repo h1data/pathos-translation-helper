@@ -1,39 +1,37 @@
-// table to convert above multiple concepts
-const keyMap =
-  {
-    "AppearanceName": "ItemName",
-  };
-
 // output data duplicate lines in JSON
 function checkDuplicates(id, mode) {
   console.log('checkDuplicates');
-  let sheetName = sheetNames[0];  // fixed to dictionary
-  let inputArray = SpreadsheetApp.openById(id).getSheetByName(sheetName).getDataRange().getValues();
-  let midArray = new Array();
-  let counts = {};
-  let outputArray = new Array();
-  for (let i = 1; i < inputArray.length; i++) {
+  // table to convert above multiple concepts
+  const keyMap =
+  {
+    "AppearanceName": "ItemName",
+  };
+  const sheet = SpreadsheetApp.openById(id).getSheetByName(sheetNames[0]);
+  const inputArray = sheet.getRange(2, 1, sheet.getLastRow()-1, 5).getValues();
+  const midArray = new Array();
+  const counts = {};
+  const outputArray = new Array();
+  for (line of inputArray) {
     let output;
-    let key = keyMap[inputArray[i][1]];
-    console.info('concept=' + inputArray[i][1] + ', key=' + key);
-    if (keyMap[inputArray[i][1]] === undefined) {
-      key = inputArray[i][1];
+    let key = keyMap[line[1]];
+    if (keyMap[line[1]] === undefined) {
+      key = line[1];
     }
     if (mode == '0') {  // normal
-      if (inputArray[i][4] == '') {
-        output = [inputArray[i][0], inputArray[i][1], inputArray[i][2], inputArray[i][3]];
-        key += inputArray[i][3];
+      if (line[4] == '') {
+        output = [line[0], line[1], line[2], line[3]];
+        key += line[3];
       } else {
-        output = [inputArray[i][0], inputArray[i][1], inputArray[i][2], inputArray[i][4]];
-        key += inputArray[i][4];
+        output = [line[0], line[1], line[2], line[4]];
+        key += line[4];
       }
     } else {  // provisional
-      if (inputArray[i][3] == '') {
-        output = [inputArray[i][0], inputArray[i][1], inputArray[i][2], inputArray[i][4]];
-        key += inputArray[i][4];
+      if (line[3] == '') {
+        output = [line[0], line[1], line[2], line[4]];
+        key += line[4];
       } else {
-        output = [inputArray[i][0], inputArray[i][1], inputArray[i][2], inputArray[i][3]];
-        key += inputArray[i][3];
+        output = [line[0], line[1], line[2], line[3]];
+        key += line[3];
       }
     }
     midArray.push(output);
@@ -46,16 +44,14 @@ function checkDuplicates(id, mode) {
   for (let output of midArray) {
     let key = output[1] + output[3];
     if (keyMap[output[1]] === undefined) {
-      console.log('not in keyMap: ' + output[1]);
       key = output[1];
     } else {
       key = keyMap[output[1]];
-      console.log('found in keyMap: ' + output[1] + ', ' + key);
     }
     key += output[3];
     if (counts[key] >= 2) {
       outputArray.push(output);
     }
   }
-  return JSON.stringify(outputArray);
+  return outputArray;
 }

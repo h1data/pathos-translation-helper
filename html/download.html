@@ -5,9 +5,9 @@
     <base target="_top">
     <script type="text/javascript">
       window.onload = function() {
-        var id = <?= getId(); ?>;
-        var type = <?= getType(); ?>;
-        var mode = <?= getMode(); ?>;
+        var id = '<?= getId(); ?>';
+        var type = '<?= getType(); ?>';
+        var mode = '<?= getMode(); ?>';
         // obtain CSV data via GAS
         google.script.run
           .withSuccessHandler(
@@ -16,20 +16,25 @@
               if (type == '0') {
                 // prepend BOM only for Dictionary file
                 var blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]),
-                                   content], {'type': 'text/csv'});
+                                   content], {'type': 'text/plain'});
               } else {
-                var blob = new Blob([content], {'type': 'text/csv'});
+                var blob = new Blob([content], {'type': 'text/plain'});
               }
-              document.getElementById('message').innerHTML = <?= text.download.message; ?>;
-              console.log('...');
-              var link = document.createElement('a');
-              // obtain file name via GAS
-              link.download = <?= getFileName(); ?>;
-              // attempt to download
-              link.href = window.URL.createObjectURL(blob);
-              link.target = '_blank';
-              link.rel = 'noreferrer';
-              link.click();
+              var fileName = '<?= getFileName(); ?>';
+              document.getElementById('message').textContent = '<?= text.download.message; ?>';
+              if (window.navigator.msSaveBlob) {
+                // IE or Edge
+                window.navigator.msSaveBlob(blob, filename);
+              } else {
+                var link = document.createElement('a');
+                // obtain file name via GAS
+                link.download = fileName;
+                // attempt to download
+                link.href = window.URL.createObjectURL(blob);
+                link.target = '_blank';
+                link.rel = 'noreferrer';
+                link.click();
+              }
               // close browser tab automatically
               setTimeout(function(){ window.top.close(); }, 1000);
             }
@@ -40,6 +45,6 @@
   </head>
   <body>
     <h2><?= text.title; ?></h2>
-    <div id="message"><?= text.download.loading; ?></p>
+    <div id="message"><?= text.download.loading; ?></div>
   </body>
 </html>

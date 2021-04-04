@@ -8,16 +8,15 @@
     <?!= HtmlService.createHtmlOutputFromFile('html/style').getContent(); ?>
     <script type="text/javascript">
       window.onload = function(){
-        var id = <?= getId(); ?>;
-        var mode = <?= getMode(); ?>;
+        var id = '<?= getId(); ?>';
+        var mode = '<?= getMode(); ?>';
         if (mode == '2') document.getElementById('provisional').hidden = false;
         google.script.run
           .withSuccessHandler(
-            function (result) {
-              var data = JSON.parse(result);
+            function (data) {
               document.getElementById('result').hidden = false;
               if (data.size == 0) {
-                document.getElementById('message').innerHTML = <?= text.check.noResult; ?>;
+                document.getElementById('message').textContent = '<?= text.check.noResult; ?>';
                 return;
               }
               for(var i=0; i<data.length; i++) {
@@ -31,7 +30,7 @@
                 }
                 document.getElementById('result-table').append(tr);
               }
-              document.getElementById('message').innerHTML = <?= text.check.normal; ?>;
+              document.getElementById('message').textContent = '<?= text.check.normal; ?>';
             }
           )
           .checkDuplicates(id, mode);
