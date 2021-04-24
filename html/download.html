@@ -3,8 +3,10 @@
   <head>
     <title><?= text.title; ?></title>
     <base target="_top">
+    <?!= HtmlService.createHtmlOutputFromFile('html/loader').getContent(); ?>
     <script type="text/javascript">
       window.onload = function() {
+        toggleAnimation('loadSpan', 'loadSvg');
         var id = '<?= getId(); ?>';
         var type = '<?= getType(); ?>';
         var mode = '<?= getMode(); ?>';
@@ -21,6 +23,7 @@
                 var blob = new Blob([content], {'type': 'text/plain'});
               }
               var fileName = '<?= getFileName(); ?>';
+              toggleAnimation('loadSpan', 'loadSvg');
               document.getElementById('message').textContent = '<?= text.download.message; ?>';
               if (window.navigator.msSaveBlob) {
                 // IE or Edge
@@ -45,6 +48,7 @@
   </head>
   <body>
     <h2><?= text.title; ?></h2>
-    <div id="message"><?= text.download.loading; ?></div>
+    <span id="loadSpan"><svg id="loadSvg" width="1.0em" height="1.0em" xmlns="http://www.w3.org/2000/svg"></svg></span>
+    <span id="message"><?= text.download.loading; ?></span>
   </body>
 </html>

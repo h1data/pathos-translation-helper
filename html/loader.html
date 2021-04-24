@@ -1,0 +1,38 @@
+<script type="text/javascript">
+  toggleAnimation.visible = null;
+  function toggleAnimation(spanId, svgId) {
+      this.numNodes = 48;
+      this.width = 2;
+      this.speed = 0.33;
+      this.r = '0.9px'
+      this.time = 0;
+      const twoPi = Math.PI * 2.0;
+      if (this.visible == null) {
+          var svg = document.getElementById(svgId);
+          for(var i=0; i<numNodes; i++) {
+          var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          dot.id = 'dot' + i;
+          dot.setAttribute('cx', (i/numNodes) + 'em');
+          dot.setAttribute('cy', '0.5em');
+          dot.setAttribute('r', r);
+          dot.style.fillOpacity = 1.0 - 2 * Math.abs((numNodes*0.5 - i))/numNodes;
+          svg.appendChild(dot);
+          }
+          this.visible = false;
+      } 
+      visible = !visible;
+      document.getElementById(spanId).hidden = !visible;
+      if (visible) requestAnimationFrame(animate);
+      
+      function animate() {
+          if (visible) {
+              for (var i=0; i<numNodes; i++) {
+                  var dot = document.getElementById('dot' + i);
+                  dot.setAttribute('cy', ( (Math.sin(((time + i)/numNodes * width) * twoPi) + 1.0 ) * 0.40 + 0.1) + 'em');
+              }
+              time = (time + speed) % numNodes;
+              requestAnimationFrame(animate);
+          }
+      }
+  }
+  </script>
