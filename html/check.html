@@ -6,14 +6,17 @@
     <meta http-equiv="Content-Language" content="ja">
     <title><?= text.title; ?></title>
     <?!= HtmlService.createHtmlOutputFromFile('html/style').getContent(); ?>
+    <?!= HtmlService.createHtmlOutputFromFile('html/loader').getContent(); ?>
     <script type="text/javascript">
       window.onload = function(){
+        toggleAnimation('loadSpan', 'loadSvg');
         var id = '<?= getId(); ?>';
         var mode = '<?= getMode(); ?>';
         if (mode == '2') document.getElementById('provisional').hidden = false;
         google.script.run
           .withSuccessHandler(
             function (data) {
+              toggleAnimation('loadSpan', 'loadSvg');
               document.getElementById('result').hidden = false;
               if (data.size == 0) {
                 document.getElementById('message').textContent = '<?= text.check.noResult; ?>';
@@ -40,7 +43,8 @@
   <body>
     <h2><?= text.title; ?></h2>
     <div id="provisional" hidden><?= text.check.provisional; ?></div>
-    <div id="message"><?= text.check.checking; ?></div>
+    <span id="loadSpan"><svg id="loadSvg" width="1.0em" height="1.0em" xmlns="http://www.w3.org/2000/svg"></svg></span>
+    <span id="message"><?= text.check.checking; ?></span>
     <div id="result" hidden>
       <table id="result-table">
         <tr>

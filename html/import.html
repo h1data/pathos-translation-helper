@@ -6,6 +6,7 @@
     <title><?= text.title; ?></title>
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
     <?!= HtmlService.createHtmlOutputFromFile('html/style').getContent(); ?>
+    <?!= HtmlService.createHtmlOutputFromFile('html/loader').getContent(); ?>
     <script type="text/javascript">
       var inpLoadButton;
       var inpFile;
@@ -39,7 +40,6 @@
         inpLoadButton.removeAttribute('disabled');
       }
       function loadFile() {
-        console.log('load button pressed');
         const selectedFile = inpFile.files[0];
         inpFile.setAttribute('disabled', true);
         inpLoadButton.setAttribute('disabled', true);
@@ -50,17 +50,20 @@
             .withFailureHandler(
               function(arg) {
                 inpFile.removeAttribute('disabled');
+                toggleAnimation('loadSpan', 'loadSvg');
                 divMessage.textContent = '<?= text.import.fileLoadFailed; ?>';
               }
             )
             .loadFile(id, selectedFile.name, e.target.result);
         };
+        toggleAnimation('loadSpan', 'loadSvg');
         divMessage.textContent = '<?= text.import.loading; ?>';
         fileReader.readAsText(selectedFile);
       }
 
       function displayDiff(arg) {
         diffData = arg;
+        toggleAnimation('loadSpan', 'loadSvg');
         if (diffData == -1) {
           divMessage.textContent = '<?= text.import.illegalFileFormat; ?>';
           inpFile.removeAttribute('disabled');
@@ -115,6 +118,7 @@
       }
 
       function execute() {
+        toggleAnimation('loadSpan', 'loadSvg');
         divMessage.textContent = '<?= text.import.updating; ?>';
         inpExecute.setAttribute('disabled', 'true');
         inpReturn.setAttribute('disabled', 'true');
@@ -122,12 +126,14 @@
         google.script.run
           .withSuccessHandler(
             function(arg) {
+              toggleAnimation('loadSpan', 'loadSvg');
               divMessage.textContent = '<?= text.import.updated; ?>';
               inpReturn.removeAttribute('disabled');
             }
           )
           .withFailureHandler(
             function(arg) {
+              toggleAnimation('loadSpan', 'loadSvg');
               divMessage.textContent = '<?= text.import.updateFailed; ?>';
               inpReturn.removeAttribute('disabled');
             }
@@ -150,7 +156,8 @@
         <input type="file" id="file" class="file" accept=".Dictionary,.Guides" />
         <input type="button" id="loadButton" class="action" value="<?= text.import.loadButton; ?>" onclick="loadFile()" disabled="true" />
       </div>
-      <p id="message"><?= text.import.initialMessage; ?></p>
+      <p><span id="loadSpan" hidden><svg id="loadSvg" width="1.0em" height="1.0em" xmlns="http://www.w3.org/2000/svg"></svg></span>
+        <span id="message"><?= text.import.initialMessage; ?></span></p>
       <div id="changes" hidden>
         <p>
           <input type="button" id="executeButton" value="<?= text.import.executeButton; ?>" class="create" onclick="execute()" />
