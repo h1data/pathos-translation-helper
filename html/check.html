@@ -16,7 +16,6 @@
         google.script.run
           .withSuccessHandler(
             function (data) {
-              document.getElementById('loadSpan').hidden = true;
               toggleAnimation('loadSpan', 'loadSvg');
               document.getElementById('result').hidden = false;
               if (data.size == 0) {
