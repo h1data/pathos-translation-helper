@@ -30,7 +30,7 @@ const text = {
     add: '追加',
     del: '削除',
     addDateComment: function(date) { return date + '追加'; },
-    memoColumn: [11, 8]
+    memoColumn: [11, 9]
   }
 };
 
