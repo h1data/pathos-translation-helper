@@ -2,13 +2,15 @@
 const text = {
   title: 'Pathos Translation Helper',
   download : {
-  loading: 'loading...',
-  message: 'The download data is ready to download. This windows will be closed automatically'
+    loading: 'loading...',
+    completed: 'The download data is ready to download. You may close this tab/window.',
+    failed: 'Download failed.',
   },
   check : {
     checking: 'checking...',
     normal: 'Belows are duplicated.',
     noResult: 'Checked but no duplication was found. Perhaps check function does not work properly.',
+    failed: 'Check failed.',
     provisional: '[provisional]'
   },
   import : {
@@ -36,6 +38,9 @@ const text = {
 
 // the input sheet names for each type (dictionary, guides)
 const sheetNames = ['dictionary', 'guides'];
+
+// for validation of if the spreadsheet is proper one
+const spreadsheetName = 'Pathos translation';
 
 // file names for each type and mode
 const fileNames = [

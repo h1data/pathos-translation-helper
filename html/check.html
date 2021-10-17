@@ -36,6 +36,12 @@
               document.getElementById('message').textContent = '<?= text.check.normal; ?>';
             }
           )
+          .withFailureHandler(
+            function(content) {
+              toggleAnimation('loadSpan', 'loadSvg');
+              document.getElementById('message').textContent = '<?= text.check.failed; ?>';
+            }
+          )
           .checkDuplicates(id, mode);
       }
     </script>
