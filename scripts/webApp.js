@@ -35,7 +35,6 @@ function doGet(e){
 
 // check parameters from request URI
 function checkParameters() {
-  console.info('id\'s length: ' + id__.length);
   if (id__.length != 44) {
     return false;
   }
@@ -75,4 +74,17 @@ function getMode() {
 // obtain spreadsheet id
 function getId() {
   return id__;
+}
+
+// validation with spreadsheet name and if it is shared
+function validateAndGetSpreadsheet(id) {
+  const spreadsheet = SpreadsheetApp.openById(id);
+  if (spreadsheet.getName() != spreadsheetName) {
+    console.error('invalid spreadsheet name: ', spreadsheet.getName(), id);
+    throw 'failed';
+  } else if (spreadsheet.getEditors().length < 2) {
+    console.error('not shared spreadsheet', spreadsheet.getName(), id);
+    throw 'failed';
+  }
+  return spreadsheet;
 }

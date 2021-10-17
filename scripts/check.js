@@ -6,7 +6,7 @@ function checkDuplicates(id, mode) {
   {
     "AppearanceName": "ItemName",
   };
-  const sheet = SpreadsheetApp.openById(id).getSheetByName(sheetNames[0]);
+  const sheet = validateAndGetSpreadsheet(id).getSheetByName(sheetNames[0]);
   const inputArray = sheet.getRange(2, 1, sheet.getLastRow()-1, 5).getValues();
   const midArray = new Array();
   const counts = {};
