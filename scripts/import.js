@@ -20,11 +20,11 @@ function loadFile(id, fileName, data) {
     valueSheet = valueSheetGuides;
   } else {
     console.warn('illegal file name: ' + fileName);
-    return -1;
+    throw 'failed';
   }
 
   const lines = data.split('\r\n');
-  const sheet = SpreadsheetApp.openById(id).getSheetByName(sheetName);
+  const sheet = validateAndGetSpreadsheet(id).getSheetByName(sheetName);
   const sheetData = sheet.getRange(2, 1, sheet.getLastRow()-1, 5).getValues();
   let guideCsvSepCount = 0;
   let guideCsvTopic = '';
@@ -50,7 +50,7 @@ function loadFile(id, fileName, data) {
         columns = lines[i].match(regGuides);
         if (columns.length > 2) {
           console.warn('illegal format', lines[i], columns);
-          return -1;
+          throw 'failed';
         }
         if (columns[0].search(/#.+/g) == 0) {
           guideCsvTopic = columns[0];
@@ -64,7 +64,7 @@ function loadFile(id, fileName, data) {
       columns = lines[i].match(regDictionary);
       if (columns.length < 2 || columns.length > 3) {
         console.warn('illegal format', lines[i], columns);
-        return -1;
+        throw 'failed';
       }
       for (let j=1; j<columns.length; j++) {
         columns[j] = columns[j].replace(/^[\"]|[\"]$/g, '').replace(/""/g, '\"');
@@ -132,7 +132,7 @@ function loadFile(id, fileName, data) {
 }
 
 function applyData(mode, id, diff, epoch) {
-  const sheet = SpreadsheetApp.openById(id).getSheetByName(sheetNames[mode - 1]);
+  const sheet = validateAndGetSpreadsheet(id).getSheetByName(sheetNames[mode - 1]);
   let date = (new Date(epoch)).toLocaleDateString();
   date = text.import.addDateComment(date);
   let addOffset = 1;

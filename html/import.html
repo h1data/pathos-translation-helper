@@ -28,9 +28,9 @@
       }
       function checkFileName() {
         const selectedFile = inpFile.files[0];
-        if (selectedFile.name == 'ja.Dictionary') {
+        if (selectedFile.name == '<?= fileNames[0][0]; ?>') {
           mode = 1;
-        } else if (selectedFile.name == 'ja.Guides') {
+        } else if (selectedFile.name == '<?= fileNames[1][0]; ?>') {
           mode = 2;
         } else {
           divMessage.textContent = '<?= text.import.illegalFileName; ?>';

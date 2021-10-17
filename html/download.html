@@ -24,7 +24,7 @@
               }
               var fileName = '<?= getFileName(); ?>';
               toggleAnimation('loadSpan', 'loadSvg');
-              document.getElementById('message').textContent = '<?= text.download.message; ?>';
+              document.getElementById('message').textContent = '<?= text.download.completed; ?>';
               if (window.navigator.msSaveBlob) {
                 // IE or Edge
                 window.navigator.msSaveBlob(blob, filename);
@@ -40,6 +40,12 @@
               }
               // close browser tab automatically
               setTimeout(function(){ window.top.close(); }, 1000);
+            }
+          )
+          .withFailureHandler(
+            function(content) {
+              toggleAnimation('loadSpan', 'loadSvg');
+              document.getElementById('message').textContent = '<?= text.download.failed; ?>';
             }
           )
           .getCsvData(id, type, mode);
