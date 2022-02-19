@@ -7,6 +7,9 @@ function loadFile(id, fileName, data) {
   const _guides = 1;
   const regDictionary = /"([^"]|(""))+"|[^,]+/g;
   const regGuides = /"([^"]|(""))+"|[^;]+/g;
+  // escape pattern for ';;' in guides file
+  const semiEscape = {target: ';;', escape: '___SEMICOLON___'};
+
   console.log(fileName);
   if (fileName == fileNames[0][0]) {
     mode = _dictionary;
@@ -47,16 +50,16 @@ function loadFile(id, fileName, data) {
           keyCSV = lines[i] + guideCsvTopic;
         }
       } else {
-        columns = lines[i].match(regGuides);
+        columns = lines[i].replace(semiEscape.target, semiEscape.escape).match(regGuides);
         if (columns.length > 2) {
           console.warn('illegal format', lines[i], columns);
           throw 'failed';
         }
         if (columns[0].search(/#.+/g) == 0) {
-          guideCsvTopic = columns[0];
+          guideCsvTopic = columns[0].replace(semiEscape.escape, semiEscape.target);
           guideCsvSepCount = 0;
         }
-        keyCSV = columns[0];
+        keyCSV = columns[0].replace(semiEscape.escape, semiEscape.target);
       }
     } else if (i < lines.length && lines[i] != '') {
       // dictionary csv
@@ -126,7 +129,9 @@ function loadFile(id, fileName, data) {
   }
 
   function valueCsvGuides(csvLine, row) {
-    return ['add', '', row, csvLine[0].trimStart(), csvLine[1] == null ? '' : csvLine[1].trimStart()];
+    return ['add', '',
+            row, csvLine[0].replace(semiEscape.escape, semiEscape.target).trimStart(),
+            csvLine[1] == null ? '' : csvLine[1].replace(semiEscape.escape, semiEscape.target).trimStart()];
   }
 
 }
