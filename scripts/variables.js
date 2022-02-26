@@ -11,7 +11,8 @@ const text = {
     normal: '項目重複、ヨシ!!!!',
     noResult: 'チェックしましたが重複する項目はありませんでした。もしかするとチェック処理が正しく動作していないかも知れません。',
     failed: 'チェックに失敗しました。',
-    provisional: '【暫定版】'
+    provisional: '【暫定版】',
+    headers: ['行番号', '項目', '原文', '訳']
   },
   import : {
     initialMessage: 'ja.Dictionary または ja.Guides ファイルを選択し、読み込みボタンを押してください。',
@@ -28,7 +29,7 @@ const text = {
     updating: 'シートへ反映中...',
     updated: 'シートへの反映が完了しました。',
     updateFailed: 'シートへの反映に失敗しました。',
-    header: '変更,行番号,項目,原文,訳',
+    headers: ['変更', '行番号', '項目', '原文', '訳'],
     add: '追加',
     del: '削除',
     addDateComment: function(date) { return date + '追加'; },
