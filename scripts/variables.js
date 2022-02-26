@@ -11,7 +11,8 @@ const text = {
     normal: 'Belows are duplicated.',
     noResult: 'Checked but no duplication was found. Perhaps check function does not work properly.',
     failed: 'Check failed.',
-    provisional: '[provisional]'
+    provisional: '[provisional]',
+    headers: ['line', 'concept', 'original', 'translation']
   },
   import : {
     initialMessage: 'Select Dictionary or Guides file and press the load button.',
@@ -28,7 +29,7 @@ const text = {
     updating: 'applying to the spread sheet...',
     updated: 'Applying to the spread sheet has been completed.',
     updateFailed: 'Failed to apply to the spread sheet.',
-    header: 'mod,line,concept,original,translation',
+    headers: ['mod', 'line', 'concept', 'original', 'translation'],
     add: 'add',
     del: 'del',
     addDateComment: function(date) { return 'added on ' + date; },
