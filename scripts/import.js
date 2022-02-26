@@ -5,11 +5,12 @@ function loadFile(id, fileName, data) {
   let mode;
   const _dictionary = 0;
   const _guides = 1;
+  // regexp to split csv lines
   const regDictionary = /"([^"]|(""))+"|[^,]+/g;
   const regGuides = /"([^"]|(""))+"|[^;]+/g;
   // escape pattern for ';;' in guides file
-  const semiEscape = {target: ';;', escape: '___SEMICOLON___'};
-  const semiRegExp = new RegExp(semiEscape.target, 'g');
+  const regSemiTarget = /;;/g;
+  const regSemiEscape = /___SEMICOLON___/g;
 
   console.log(fileName);
   if (fileName == fileNames[0][0]) {
@@ -51,16 +52,16 @@ function loadFile(id, fileName, data) {
           keyCSV = lines[i] + guideCsvTopic;
         }
       } else {
-        columns = lines[i].replace(semiRegExp, semiEscape.escape).match(regGuides);
+        columns = lines[i].replace(regSemiTarget, regSemiEscape.source).match(regGuides);
         if (columns.length > 2) {
           console.warn('illegal format', lines[i], columns);
           throw 'failed';
         }
         if (columns[0].search(/#.+/g) == 0) {
-          guideCsvTopic = columns[0].replace(semiEscape.escape, semiEscape.target);
+          guideCsvTopic = columns[0].replace(regSemiEscape, regSemiTarget.source);
           guideCsvSepCount = 0;
         }
-        keyCSV = columns[0].replace(semiEscape.escape, semiEscape.target);
+        keyCSV = columns[0].replace(regSemiEscape, regSemiTarget.source);
       }
     } else if (i < lines.length && lines[i] != '') {
       // dictionary csv
@@ -131,8 +132,8 @@ function loadFile(id, fileName, data) {
 
   function valueCsvGuides(csvLine, row) {
     return ['add', '',
-            row, csvLine[0].replace(semiEscape.escape, semiEscape.target).trimStart(),
-            csvLine[1] == null ? '' : csvLine[1].replace(semiEscape.escape, semiEscape.target).trimStart()];
+            row, csvLine[0].replace(regSemiEscape, regSemiTarget.source).trimStart(),
+            csvLine[1] == null ? '' : csvLine[1].replace(regSemiEscape, regSemiTarget.source).trimStart()];
   }
 
 }
