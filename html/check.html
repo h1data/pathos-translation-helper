@@ -22,16 +22,18 @@
                 document.getElementById('message').textContent = '<?= text.check.noResult; ?>';
                 return;
               }
+              let table = document.getElementById('result-table-body');
               for(var i=0; i<data.length; i++) {
                 var tr = document.createElement('tr');
                 var isCritical = /Name$/.test(data[i][1]) && data[i][1] != 'ClassName' && data[i][1] != 'RaceName';
                 for(var j=0; j<4; j++){
                   var td = document.createElement('td');
                   td.append(data[i][j]);
-                  if(isCritical) td.setAttribute('class', 'warn');
+                  if(j == 0) td.classList.add('line');
+                  if(isCritical) td.classList.add('warn');
                   tr.append(td);
                 }
-                document.getElementById('result-table').append(tr);
+                table.append(tr);
               }
               document.getElementById('message').textContent = '<?= text.check.normal; ?>';
             }
@@ -52,13 +54,16 @@
     <span id="loadSpan"><svg id="loadSvg" width="1.0em" height="1.0em" xmlns="http://www.w3.org/2000/svg"></svg></span>
     <span id="message"><?= text.check.checking; ?></span>
     <div id="result" hidden>
-      <table id="result-table">
-        <tr>
-          <th>line</th>
-          <th>concept</th>
-          <th>original</th>
-          <th>translation</th>
-        </tr>
+      <table id="result-table-head">
+        <thead>
+          <tr>
+            <th><?= text.check.headers[0]; ?></th>
+            <th><?= text.check.headers[1]; ?></th>
+            <th><?= text.check.headers[2]; ?></th>
+            <th><?= text.check.headers[3]; ?></th>
+          </tr>
+        </thead>
+          <tbody id="result-table-body" />
       </table>
     </div>
   </body>

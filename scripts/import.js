@@ -9,6 +9,7 @@ function loadFile(id, fileName, data) {
   const regGuides = /"([^"]|(""))+"|[^;]+/g;
   // escape pattern for ';;' in guides file
   const semiEscape = {target: ';;', escape: '___SEMICOLON___'};
+  const semiRegExp = new RegExp(semiEscape.target, 'g');
 
   console.log(fileName);
   if (fileName == fileNames[0][0]) {
@@ -35,7 +36,7 @@ function loadFile(id, fileName, data) {
   let guideSheetTopic = '';
   let diffData = new Map();
   // parse every line in both csv and spread sheet
-  for (i=0, j=0; (i < lines.length) || (j < sheetData.length); i++, j++) {
+  for (let i=0, j=0; (i < lines.length) || (j < sheetData.length); i++, j++) {
     let keyCSV = false;
     let columns;
     // parse csv line into columns and determine the key
@@ -50,7 +51,7 @@ function loadFile(id, fileName, data) {
           keyCSV = lines[i] + guideCsvTopic;
         }
       } else {
-        columns = lines[i].replace(semiEscape.target, semiEscape.escape).match(regGuides);
+        columns = lines[i].replace(semiRegExp, semiEscape.escape).match(regGuides);
         if (columns.length > 2) {
           console.warn('illegal format', lines[i], columns);
           throw 'failed';

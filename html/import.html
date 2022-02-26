@@ -74,22 +74,38 @@
           inpFile.removeAttribute('disabled');
           return;
         }
-        while (document.getElementById('diffTable').firstChild) {
-          document.getElementById('diffTable').removeChild(document.getElementById('diffTable').firstChild);
+        let table = document.getElementById('diffTable');
+        while (table.firstChild) {
+          table.removeChild(table.firstChild);
         }
         let tr = document.createElement('tr');
-        const header = '<?= text.import.header ?>'.split(',');
         for (let i=0; i<5; i++) {
           if (i == 2 && mode == 2) continue;
           let th = document.createElement('th');
-          th.append(header[i]);
+          switch (i) {
+            case 0:
+              th.textContent = '<?= text.import.headers[0]; ?>';
+              break;
+            case 1:
+              th.textContent = '<?= text.import.headers[1]; ?>';
+              break;
+            case 2:
+              th.textContent = '<?= text.import.headers[2]; ?>';
+              break;
+            case 3:
+              th.textContent = '<?= text.import.headers[3]; ?>';
+              break;
+            case 4:
+              th.textContent = '<?= text.import.headers[4]; ?>';
+              break;
+          }
           if (i == 1) {
             th.setAttribute('colspan', 2);
-            th.setAttribute('class', 'line');
+            th.classList.add('line');
           }
           tr.append(th);
         }
-        document.getElementById('diffTable').append(tr);
+        table.append(tr);
         
         divChanges.removeAttribute('hidden');
         for (let i=0; i<diffData.length; i++) {
@@ -99,18 +115,18 @@
             if (j == 0) {
               if (diffData[i][j] == 'add') {
                 td.append('<?= text.import.add; ?>');
-                td.setAttribute('class', 'red');
+                td.classList.add('red');
               } else if (diffData[i][j] == 'del') {
                 td.append('<?= text.import.del; ?>');
-                td.setAttribute('class', 'blue');
+                td.classList.add('blue');
               }
             } else {
               td.append(diffData[i][j]);
             }
-            if (j == 1 || j == 2) td.setAttribute('class', 'line');
+            if (j == 1 || j == 2) td.classList.add('line');
             tr.append(td);
           }
-          document.getElementById('diffTable').append(tr);
+          table.append(tr);
         }
         divMessage.textContent = '<?= text.import.differenceConfirm; ?>';
         inpExecute.removeAttribute('disabled');
