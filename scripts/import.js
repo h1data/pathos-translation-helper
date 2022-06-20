@@ -169,6 +169,7 @@ function applyData(fileType, diff, epoch) {
         sheet.getRange(line[2] + addOffset, 1).setFormula('=row() -1');
         sheet.getRange(line[2] + addOffset, 2, 1, 3).setValues([[line[3], line[4], line[5]]]);
         sheet.getRange(line[2] + addOffset, text.import.memoColumn[0]).setValue(date);
+        sheet.getRange(line[2] + addOffset, 1, 1, lastColumn).setBackground(null);
       } else {
         sheet.getRange(line[2] + addOffset, 1, 1, 2).setValues([[line[3], line[4]]]);
         sheet.getRange(line[2] + addOffset, text.import.memoColumn[1]).setValue(date);
