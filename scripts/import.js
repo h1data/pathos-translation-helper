@@ -1,10 +1,13 @@
-function loadFile(id, fileName, data) {
+/**
+ * load file contents and check differences to the spread sheet
+ * @param {string} fileName 
+ * @param {string} fileContents 
+ * @returns {string} differential data
+ */
+function loadFile(fileName, fileContents) {
   let sheetName;
   let valueCsv;
   let valueSheet;
-  let mode;
-  const _dictionary = 0;
-  const _guides = 1;
   // regexp to split csv lines
   const regDictionary = /"([^"]|(""))+"|[^,]+/g;
   const regGuides = /"([^"]|(""))+"|[^;]+/g;
@@ -13,14 +16,12 @@ function loadFile(id, fileName, data) {
   const regSemiEscape = /___SEMICOLON___/g;
 
   console.log(fileName);
-  if (fileName == fileNames[0][0]) {
-    mode = _dictionary;
-    sheetName = sheetNames[0];
+  if (fileName === dictionaryFileName) {
+    sheetName = PropertiesService.getScriptProperties().getProperty('dictionarySheet');
     valueCsv = valueCsvDictionary;
     valueSheet = valueSheetDictionary;
-  } else if (fileName == fileNames[1][0]) {
-    mode = _guides;
-    sheetName = sheetNames[1];
+  } else if (fileName == guidesFileName) {
+    sheetName = PropertiesService.getScriptProperties().getProperty('guidesSheet');
     valueCsv = valueCsvGuides;
     valueSheet = valueSheetGuides;
   } else {
@@ -28,9 +29,10 @@ function loadFile(id, fileName, data) {
     throw 'failed';
   }
 
-  const lines = data.split('\r\n');
-  const sheet = validateAndGetSpreadsheet(id).getSheetByName(sheetName);
+  const lines = fileContents.split('\r\n');
+  const sheet = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('sheetID')).getSheetByName(sheetName);
   const sheetData = sheet.getRange(2, 1, sheet.getLastRow()-1, 5).getValues();
+  const isGuides = fileName === guidesFileName;
   let guideCsvSepCount = 0;
   let guideCsvTopic = '';
   let guideSheetSepCount = 0;
@@ -41,7 +43,7 @@ function loadFile(id, fileName, data) {
     let keyCSV = false;
     let columns;
     // parse csv line into columns and determine the key
-    if (mode == _guides && i < lines.length) {
+    if (isGuides && i < lines.length) {
       // guides csv
       if (lines[i] == '/') {
         columns = [lines[i], ''];
@@ -63,7 +65,7 @@ function loadFile(id, fileName, data) {
         }
         keyCSV = columns[0].replace(regSemiEscape, regSemiTarget.source);
       }
-    } else if (i < lines.length && lines[i] != '') {
+    } else if (!isGuides && i < lines.length && lines[i] != '') {
       // dictionary csv
       // 'a,"b, c", d' -> {'a', 'b, c', 'd'}
       columns = lines[i].match(regDictionary);
@@ -80,7 +82,7 @@ function loadFile(id, fileName, data) {
     // determine the key for each line in spread sheet
     let keySheet = false;
     if (j < sheetData.length) {
-      if (mode == _guides) {
+      if (isGuides) {
         if (sheetData[j][0] == '/') {
           keySheet = sheetData[j][0] + guideSheetTopic + guideSheetSepCount++;
         } else if (sheetData[j][0] == '') {
@@ -138,8 +140,23 @@ function loadFile(id, fileName, data) {
 
 }
 
-function applyData(mode, id, diff, epoch) {
-  const sheet = validateAndGetSpreadsheet(id).getSheetByName(sheetNames[mode - 1]);
+/**
+ * apply differences to spread sheet
+ * @param {number} fileType referred to FileType
+ * @param {Array} diff differential data
+ * @param {Date} epoch timpstamp of the file
+ */
+function applyData(fileType, diff, epoch) {
+  if (fileType == FileType.dictionary) {
+    var sheetName = PropertiesService.getScriptProperties().getProperty('dictionarySheet');
+  } else if (fileType == FileType.guides) {
+    var sheetName = PropertiesService.getScriptProperties().getProperty('guidesSheet');
+  } else {
+    console.error('invalid fileType', fileType)
+    throw 'invalid fileType';
+  }
+  const sheet = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('sheetID'))
+                              .getSheetByName(sheetName);
   let date = (new Date(epoch)).toLocaleDateString();
   date = text.import.addDateComment(date);
   let addOffset = 1;
@@ -148,7 +165,7 @@ function applyData(mode, id, diff, epoch) {
   for (const line of diff) {
     if (line[0] == 'add') {
       sheet.insertRowBefore(line[2] + addOffset);
-      if (mode == 1) {
+      if (fileType == FileType.dictionary) {
         sheet.getRange(line[2] + addOffset, 1).setFormula('=row() -1');
         sheet.getRange(line[2] + addOffset, 2, 1, 3).setValues([[line[3], line[4], line[5]]]);
         sheet.getRange(line[2] + addOffset, text.import.memoColumn[0]).setValue(date);

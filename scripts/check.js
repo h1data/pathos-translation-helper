@@ -1,37 +1,42 @@
-// output data duplicate lines in JSON
-function checkDuplicates(id, mode) {
+/**
+ * Output data duplicate lines in JSON
+ * @param {boolean} provisional
+ * @returns JSON string
+ */
+function checkDuplicates(provisional) {
   console.log('checkDuplicates');
-  // table to convert above multiple concepts
+  /** table to convert above multiple concepts */
   const keyMap =
   {
     "AppearanceName": "ItemName",
   };
-  const sheet = validateAndGetSpreadsheet(id).getSheetByName(sheetNames[0]);
+  const sheet = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('sheetID'))
+                              .getSheetByName(PropertiesService.getScriptProperties().getProperty('dictionarySheet'));
   const inputArray = sheet.getRange(2, 1, sheet.getLastRow()-1, 5).getValues();
-  const midArray = new Array();
+  const midArray = [];
   const counts = {};
-  const outputArray = new Array();
+  const outputArray = [];
   for (line of inputArray) {
     let output;
     let key = keyMap[line[1]];
     if (keyMap[line[1]] === undefined) {
       key = line[1];
     }
-    if (mode == '0') {  // normal
-      if (line[4] == '') {
-        output = [line[0], line[1], line[2], line[3]];
-        key += line[3];
-      } else {
-        output = [line[0], line[1], line[2], line[4]];
-        key += line[4];
-      }
-    } else {  // provisional
+    if (provisional) {  // provisional
       if (line[3] == '') {
         output = [line[0], line[1], line[2], line[4]];
         key += line[4];
       } else {
         output = [line[0], line[1], line[2], line[3]];
         key += line[3];
+      }
+    } else {  // normal
+      if (line[4] == '') {
+        output = [line[0], line[1], line[2], line[3]];
+        key += line[3];
+      } else {
+        output = [line[0], line[1], line[2], line[4]];
+        key += line[4];
       }
     }
     midArray.push(output);
