@@ -1,18 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
     <base target="_top">
-    <meta http-equiv="Content-Type" content="script/html; charset=utf-8">
-    <meta http-equiv="Content-Language" content="ja">
+    <meta charset="utf-8">
     <title><?= text.title; ?></title>
     <?!= HtmlService.createHtmlOutputFromFile('html/style').getContent(); ?>
     <?!= HtmlService.createHtmlOutputFromFile('html/loader').getContent(); ?>
     <script type="text/javascript">
       window.onload = function(){
         toggleAnimation('loadSpan', 'loadSvg');
-        var id = '<?= getId(); ?>';
-        var mode = '<?= getMode(); ?>';
-        if (mode == '2') document.getElementById('provisional').hidden = false;
+        if ('<?= provisional; ?>' === 'true') document.getElementById('provisional').hidden = false;
         google.script.run
           .withSuccessHandler(
             function (data) {
@@ -23,15 +20,16 @@
                 return;
               }
               let table = document.getElementById('result-table-body');
-              for(var i=0; i<data.length; i++) {
-                var tr = document.createElement('tr');
-                var isCritical = /Name$/.test(data[i][1]) && data[i][1] != 'ClassName' && data[i][1] != 'RaceName';
-                for(var j=0; j<4; j++){
-                  var td = document.createElement('td');
-                  td.append(data[i][j]);
-                  if(j == 0) td.classList.add('line');
-                  if(isCritical) td.classList.add('warn');
+              for(let line of data) {
+                let tr = document.createElement('tr');
+                for(let column of line) {
+                  let td = document.createElement('td');
+                  td.textContent = column;
                   tr.append(td);
+                }
+                tr.firstChild.classList.add('line');
+                if (/Name$/.test(line[1]) && line[1] != 'ClassName' && line[1] != 'RaceName') {
+                  tr.classList.add('warn');
                 }
                 table.append(tr);
               }
@@ -44,7 +42,7 @@
               document.getElementById('message').textContent = '<?= text.check.failed; ?>';
             }
           )
-          .checkDuplicates(id, mode);
+          .checkDuplicates('<?= provisional; ?>' == 'true');
       }
     </script>
   </head>
@@ -63,7 +61,7 @@
             <th><?= text.check.headers[3]; ?></th>
           </tr>
         </thead>
-          <tbody id="result-table-body" />
+        <tbody id="result-table-body"></tbody>
       </table>
     </div>
   </body>

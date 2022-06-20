@@ -1,90 +1,81 @@
-// 0=dictionary, 1=guides, 2=duplicate check, 3=uploader
-var type__ = '9';
+// common constants
+/** file type (dictionary or guides) */
+const FileType = {
+  dictionary: 0,
+  guides: 1,
+}
 
-// 0=normal, 1=with line number, 2=provisional
-var mode__ = '9';
-
-// ID of spreadsheet
-var id__ = '';
-
-// return html page to client side (browser)
+/**
+ * return html page to client side
+ * @param {Map} e Web app event parameters
+ * @returns {HtmlOutput} the contents of HTML page
+ */
 function doGet(e){
-  console.info(e.queryString);
+  console.info(e);
   try {
-    id__ = e.parameters.id.toString();
-    type__ = e.parameters.type.toString();
-    if(type__ != '3') {
-      mode__ = e.parameters.mode.toString();
+    if (e.pathInfo.match(/download\/.+/)) {
+      return createDownloadPage(e);
+    } else if (e.pathInfo.match(/check.*/)) {
+      return createCheckPage(e);
+    } else if (e.pathInfo.match(/import.*/)) {
+      return HtmlService.createTemplateFromFile('html/import.html').evaluate();
+    } else {
+      return HtmlService.createTemplateFromFile('html/error.html').evaluate();
     }
-  } catch(exception) {
+  } catch (exception) {
     console.error(exception);
     return HtmlService.createTemplateFromFile('html/error.html').evaluate();
   }
-  if (checkParameters()) {
-    if (type__ == '0' || type__ == '1') {
-      return HtmlService.createTemplateFromFile('html/download.html').evaluate();
-    } else if (type__ == '2') {
-      return HtmlService.createTemplateFromFile('html/check.html').evaluate();
-    } else if (type__ == '3') {
-      return HtmlService.createTemplateFromFile('html/import.html').evaluate();
+
+  /**
+   * Create HtmlService for download
+   * @param {Map} e Web app event parameters
+   * @returns {HtmlService} HtmlService object
+   */
+  function createDownloadPage(e) {
+    try {
+      let htmlService = HtmlService.createTemplateFromFile('html/download.html');
+      if (e.pathInfo.match(/download\/dictionary/)) {
+        htmlService.fileType = FileType.dictionary;
+      } else if (e.pathInfo.match(/download\/guides/)) {
+        htmlService.fileType = FileType.guides;
+      } else {
+        console.error('illegal path', e.pathInfo);
+      }
+      if (e.parameter.numbered != undefined) {
+        htmlService.numbered = e.parameter.numbered.toLowerCase() === 'true';
+      } else {
+        htmlService.numbered = false;
+      }
+      if (e.parameter.provisional != undefined) {
+        htmlService.provisional = e.parameter.provisional.toLowerCase() === 'true';
+      } else {
+        htmlService.provisional = false;
+      }
+      return htmlService.evaluate();
+    } catch (exception) {
+      console.log(exception);
+      return HtmlService.createTemplateFromFile('html/error.html').evaluate();
     }
-  } else {
-    return HtmlService.createTemplateFromFile('html/error.html').evaluate();
   }
-}
 
-// check parameters from request URI
-function checkParameters() {
-  if (id__.length != 44) {
-    return false;
+  /**
+   * Create HtmlService for check function
+   * @param {Map} e Web app event parameters
+   * @returns {HtmlService} HtmlService object
+   */
+  function createCheckPage(e) {
+    try {
+      let htmlService = HtmlService.createTemplateFromFile('html/check.html');
+      if (e.parameter.provisional != undefined) {
+        htmlService.provisional = e.parameter.provisional.toLowerCase() === 'true';
+      } else {
+        htmlService.provisional = false;
+      }
+      return htmlService.evaluate();
+    } catch (exception) {
+      console.log(exception);
+      return HtmlService.createTemplateFromFile('html/error.html').evaluate();
+    }
   }
-  if (type__ == '0' && mode__ >= '0' && mode__ <= '2') {
-    return true;
-  } else if (type__ == '1' && (mode__ == '0' || mode__ == '2') ) {
-    return true;
-  } else if (type__ == '2' && (mode__ == '0' || mode__ == '2') ) {
-    return true;
- } else if (type__ == '3') {
-   return true;
-  } else {
-    console.error('illegal arguments');
-    return false;
-  }
-}
-
-// obtain file name
-function getFileName() {
-  if (checkParameters()) {
-    return fileNames[type__][mode__];
-  } else {
-    return 'error';
-  }
-}
-
-// obtain output type
-function getType() {
-  return type__;
-}
-
-// obtain output mode
-function getMode() {
-  return mode__;
-}
-
-// obtain spreadsheet id
-function getId() {
-  return id__;
-}
-
-// validation with spreadsheet name and if it is shared
-function validateAndGetSpreadsheet(id) {
-  const spreadsheet = SpreadsheetApp.openById(id);
-  if (spreadsheet.getName() != spreadsheetName) {
-    console.error('invalid spreadsheet name: ', spreadsheet.getName(), id);
-    throw 'failed';
-  } else if (spreadsheet.getEditors().length < 2) {
-    console.error('not shared spreadsheet', spreadsheet.getName(), id);
-    throw 'failed';
-  }
-  return spreadsheet;
 }

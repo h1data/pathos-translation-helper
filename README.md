@@ -1,6 +1,6 @@
 # Pathos Translation Helper
 
-Hail translators!
+Hail translators!<br>
 This helps Google Spreadsheet workflow for Pathos NetHack Codec translators.
 
 ## Features
@@ -8,11 +8,13 @@ This helps Google Spreadsheet workflow for Pathos NetHack Codec translators.
 - Generated files are selectable between fully modified translation,<br>
   line number mode, or provisional mode.<br>
   In line number mode, append line number for each translated word.<br>
-  In provisional mode, files are filled blank lines only, not modified existing lines.
+  In provisional mode, files are filled only when blank lines, not modified existing lines.
 - Checks duplicate translations within the same concepts.<br>
-  AppearanceName and ItemName are judged as the same concepts.
+  AppearanceName and ItemName are judged as the same concepts.<br>
+  ![duplicate check](duplicateCheck.png)
 - Semi-auto import function for Dictionary and Guides files.<br>
-  Deleted lines are not removed from spreadsheet automatically for safety, only changed background color.
+  Deleted lines are not removed from spreadsheet automatically for safety, only changed background color.<br>
+  ![import](import.png)
 
 ## How To Setup
 
@@ -44,47 +46,58 @@ npm install
 ```
 
 ### 5. Create Google Apps Script project
-Create as a Web App project.
-
-### 6. Tune scripts
-At least, you have to modify scripts/variables.js for your spreadsheet and translation filenames.
-```JavaScript
-// the input sheet names for each type (dictionary, guides)
-const sheetNames = ['dictionary', 'guides'];
-
-// for validation of if the spreadsheet is proper one
-const spreadsheetName = 'Pathos translation';
-
-// file names for each type and mode
-const fileNames = [
-  // type=0: Dictionary file
-  ['ja.Dictionary', 'ja.Dictionary_withnumber', 'ja.Dictionary_provisional'],
-  // type=1: Guides files
-  ['ja.Guides', 'error', 'ja.Guides_provisional']
-];
+First, you have to log in clasp CLI by your Google account.
+```
+clasp login
+```
+Create as a Web App project with clasp CLI.
+```
+clasp create
 ```
 
-### 7. Deploy scripts as Web Service
+Or you can create it in Google Apps Script WEB editor. https://script.google.com/<br>
+And then fetch the local directory to the WEB project.
+```
+clasp clone [your script ID]
+```
+
+### 6. Configure script properties
+
+In Google Apps Script web editor, enter your project and press the edit icon (gear wheel), and add script properties.
+- dictionarySheet: sheet name for contents of dictionary file in your spreadsheet.
+- guidesSheet: sheet name for contents of guides file in your spreadsheet.
+- sheetID: sheet ID of your spreadsheet. You can see it in URL of spreadsheet like below.<br>
+`https://docs.google.com/spreadsheets/d/[your sheet ID]/edit#gid=xxxxx`
+
+![scriptProperties.png](scriptProperties.png)
+
+### 7. Tune scripts
+At least, you have to modify scripts/variables.js for translation filenames of your language.
+```JavaScript
+// file names
+const dictionaryFileName = 'ja.Dictionary';
+const guidesFileName = 'ja.Guides';
+```
+
+### 8. Deploy scripts as Web Service
 ```
 clasp push
 clasp deploy -d [your deploy id]
 ```
 
-### 8. Add embed links of the script to the spreadsheet
-- File downloader (dictionary file)<br>
-```https://script.google.com/macros/s/[your deployment id of web app]/exec?id=[your spreadsheet id]&type=0&mode=*```<br>
-mode: 0=normal mode, 1=with line number mode, 2=provisional mode
-
-- File downloader (guides file)<br>
-```https://script.google.com/macros/s/[your deployment id of web app]/exec?id=[your spreadsheet id]&type=1&mode=*```<br>
-mode: 0=normal mode, 1=with line number mode, 2=provisional mode
+### 9. Add embed links of the script to the spreadsheet
+- File downloader<br>
+`https://script.google.com/macros/s/[your deployment id/exec/download/[fileType]?provisional=false&numbered=false`<br>
+[fileType]: `dictionary` or `guides`<br>
+provisional: if true, check with provisional mode; the original words (column C) have priority. False if not specified.<br>
+numbered: if true, append line number to translated texts. Only for dictionary file. It is useful to confirm which line is used in the game. False if not specified.
 
 - Duplicate checker<br>
-```https://script.google.com/macros/s/[your deployment id of web app]/exec?id=[your spreadsheet id]&type=2&mode=*```<br>
-mode: 0=normal mode, 2=provisional mode
+`https://script.google.com/macros/s/[your deployment id]/exec/check?provisional=false`<br>
+provisional: if true, check with provisional mode; the original words (column C) have priority. False if not specified.
 
 - File importer<br>
-```https://script.google.com/macros/s/[your deployment id of web app]/exec?id=[your spreadsheet id]&type=3```
+`https://script.google.com/macros/s/[your deployment id]/exec/import`
 
 ## Miscellaneous info
 - [Pathos NetHack Codec](https://pathos.azurewebsites.net/)

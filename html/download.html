@@ -1,28 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
+    <meta charset="utf-8">
     <title><?= text.title; ?></title>
-    <base target="_top">
     <?!= HtmlService.createHtmlOutputFromFile('html/loader').getContent(); ?>
     <script type="text/javascript">
       window.onload = function() {
         toggleAnimation('loadSpan', 'loadSvg');
-        var id = '<?= getId(); ?>';
-        var type = '<?= getType(); ?>';
-        var mode = '<?= getMode(); ?>';
+        var fileType = '<?= fileType; ?>';
         // obtain CSV data via GAS
         google.script.run
           .withSuccessHandler(
             function(content) {
               console.log('download data online');
-              if (type == '0') {
+              if (fileType == '<?= FileType.dictionary; ?>' ) {
                 // prepend BOM only for Dictionary file
                 var blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]),
                                    content], {'type': 'text/plain'});
               } else {
                 var blob = new Blob([content], {'type': 'text/plain'});
               }
-              var fileName = '<?= getFileName(); ?>';
+              var fileName = '<?= getFileName(fileType, numbered, provisional); ?>';
               toggleAnimation('loadSpan', 'loadSvg');
               document.getElementById('message').textContent = '<?= text.download.completed; ?>';
               if (window.navigator.msSaveBlob) {
@@ -48,7 +46,7 @@
               document.getElementById('message').textContent = '<?= text.download.failed; ?>';
             }
           )
-          .getCsvData(id, type, mode);
+          .getCsvData(fileType, '<?= numbered; ?>' == 'true', '<?= provisional; ?>' == 'true');
       }
   </script>
   </head>
