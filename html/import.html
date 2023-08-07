@@ -3,7 +3,7 @@
   <head>
     <base target="_top">
     <meta charset="utf-8">
-    <title><?= text.title; ?></title>
+    <title><?= DisplayTexts.TITLE; ?></title>
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
     <?!= HtmlService.createHtmlOutputFromFile('html/style').getContent(); ?>
     <?!= HtmlService.createHtmlOutputFromFile('html/loader').getContent(); ?>
@@ -27,15 +27,15 @@
       }
       function checkFileName() {
         const selectedFile = inpFile.files[0];
-        if (selectedFile.name == '<?= dictionaryFileName; ?>') {
-          fileType = <?= FileType.dictionary; ?>;
-        } else if (selectedFile.name == '<?= guidesFileName; ?>') {
-          fileType = <?= FileType.guides; ?>;
+        if (selectedFile.name == '<?= FILE_NAME_DICTIONARY; ?>') {
+          fileType = <?= FileType.DICTIONARY; ?>;
+        } else if (selectedFile.name == '<?= FILE_NAME_GUIDES; ?>') {
+          fileType = <?= FileType.GUIDES; ?>;
         } else {
-          divMessage.textContent = '<?= text.import.illegalFileName; ?>';
+          divMessage.textContent = '<?= DisplayTexts.import.ILLEGAL_FILE_NAME; ?>';
           return;
         }
-        divMessage.textContent = '<?= text.import.fileSelected; ?>';
+        divMessage.textContent = '<?= DisplayTexts.import.FILE_SELECTED; ?>';
         inpLoadButton.removeAttribute('disabled');
       }
       function loadFile() {
@@ -47,16 +47,16 @@
           google.script.run
             .withSuccessHandler(displayDiff)
             .withFailureHandler(
-              function(arg) {
+              function(error) {
                 inpFile.removeAttribute('disabled');
                 toggleAnimation('loadSpan', 'loadSvg');
-                divMessage.textContent = '<?= text.import.fileLoadFailed; ?>';
+                divMessage.textContent = '<?= DisplayTexts.import.FAILED_LOAD_FILE; ?>';
               }
             )
             .loadFile(selectedFile.name, e.target.result);
         };
         toggleAnimation('loadSpan', 'loadSvg');
-        divMessage.textContent = '<?= text.import.loading; ?>';
+        divMessage.textContent = '<?= DisplayTexts.import.LOADING; ?>';
         fileReader.readAsText(selectedFile);
       }
 
@@ -64,12 +64,12 @@
         diffData = arg;
         toggleAnimation('loadSpan', 'loadSvg');
         if (diffData == -1) {
-          divMessage.textContent = '<?= text.import.illegalFileFormat; ?>';
+          divMessage.textContent = '<?= DisplayTexts.import.ILLEGAL_FILE_FORMAT; ?>';
           inpFile.removeAttribute('disabled');
           return;
         }
         if (diffData.length == 0) {
-          divMessage.textContent = '<?= text.import.noChange; ?>';
+          divMessage.textContent = '<?= DisplayTexts.import.NO_CHANGE; ?>';
           inpFile.removeAttribute('disabled');
           return;
         }
@@ -79,62 +79,85 @@
         }
         let tr = document.createElement('tr');
         for (let i=0; i<5; i++) {
-          if (i == 2 && fileType == '<?= FileType.guides ?>') continue;
+          if (i == 2 && fileType == '<?= FileType.GUIDES ?>') continue;
           let th = document.createElement('th');
           switch (i) {
             case 0:
-              th.textContent = '<?= text.import.headers[0]; ?>';
+              th.textContent = '<?= DisplayTexts.tableHeaders.MOD; ?>';
               break;
             case 1:
-              th.textContent = '<?= text.import.headers[1]; ?>';
+              th.textContent = '<?= DisplayTexts.tableHeaders.LINE_NUMBER; ?>';
               break;
             case 2:
-              th.textContent = '<?= text.import.headers[2]; ?>';
+              th.textContent = '<?= DisplayTexts.tableHeaders.CONCEPT; ?>';
               break;
             case 3:
-              th.textContent = '<?= text.import.headers[3]; ?>';
+              th.textContent = '<?= DisplayTexts.tableHeaders.ORIGINAL; ?>';
               break;
             case 4:
-              th.textContent = '<?= text.import.headers[4]; ?>';
+              th.textContent = '<?= DisplayTexts.tableHeaders.TRANSLATION; ?>';
               break;
           }
           if (i == 1) {
             th.setAttribute('colspan', 2);
             th.classList.add('line');
           }
-          tr.append(th);
+          tr.appendChild(th);
         }
-        table.append(tr);
+        table.appendChild(tr);
         
         divChanges.removeAttribute('hidden');
-        for (let i=0; i<diffData.length; i++) {
+        for (const diff of diffData) {
           let tr = document.createElement('tr');
-          for (let j=0; j<diffData[i].length; j++) {
+          for (let i=0; i<5; i++) {
             let td = document.createElement('td');
-            if (j == 0) {
-              if (diffData[i][j] == 'add') {
-                td.append('<?= text.import.add; ?>');
-                td.classList.add('red');
-              } else if (diffData[i][j] == 'del') {
-                td.append('<?= text.import.del; ?>');
-                td.classList.add('blue');
-              }
-            } else {
-              td.append(diffData[i][j]);
+            switch (i) {
+              case 0: // mod
+                td.textContent = diff.mod;
+                if (diff.mod == '<?= DisplayTexts.import.ADD; ?>') {
+                  td.classList.add('red');
+                } else if (diff.mod == '<?= DisplayTexts.import.DEL; ?>') {
+                  td.classList.add('blue');
+                }
+                tr.appendChild(td);
+                break;
+              case 1: // line number
+                td.textContent = diff.row;
+                td.classList.add('line');
+                if (diff.mod == '<?= DisplayTexts.import.ADD; ?>') {
+                  tr.appendChild(document.createElement('td'));
+                  tr.appendChild(td);
+                } else if (diff.mod == '<?= DisplayTexts.import.DEL; ?>') {
+                  tr.appendChild(td);
+                  tr.appendChild(document.createElement('td'));
+                }
+                break;
+              case 2: // concept
+                if (fileType == '<?= FileType.DICTIONARY; ?>') {
+                  td.textContent = diff.concept;
+                  tr.appendChild(td);
+                }
+                break;
+              case 3: // original
+                td.textContent = diff.original;
+                tr.appendChild(td);
+                break;
+              case 4: // translation
+                td.textContent = diff.translation;
+                tr.appendChild(td);
+                break;
             }
-            if (j == 1 || j == 2) td.classList.add('line');
-            tr.append(td);
           }
-          table.append(tr);
+          table.appendChild(tr);
         }
-        divMessage.textContent = '<?= text.import.differenceConfirm; ?>';
+        divMessage.textContent = '<?= DisplayTexts.import.CONFIRM_DIFFERENCES; ?>';
         inpExecute.removeAttribute('disabled');
         inpReturn.removeAttribute('disabled');
       }
 
       function execute() {
         toggleAnimation('loadSpan', 'loadSvg');
-        divMessage.textContent = '<?= text.import.updating; ?>';
+        divMessage.textContent = '<?= DisplayTexts.import.UPDATING; ?>';
         inpExecute.setAttribute('disabled', 'true');
         inpReturn.setAttribute('disabled', 'true');
         const selectedFile = inpFile[0];
@@ -142,7 +165,7 @@
           .withSuccessHandler(
             function(arg) {
               toggleAnimation('loadSpan', 'loadSvg');
-              divMessage.textContent = '<?= text.import.updated; ?>';
+              divMessage.textContent = '<?= DisplayTexts.import.UPDATED; ?>';
               inpReturn.removeAttribute('disabled');
             }
           )
@@ -150,7 +173,7 @@
             function(arg) {
               console.log(arg);
               toggleAnimation('loadSpan', 'loadSvg');
-              divMessage.textContent = '<?= text.import.updateFailed; ?>';
+              divMessage.textContent = '<?= DisplayTexts.import.FAILED_UPDATE; ?>';
               inpReturn.removeAttribute('disabled');
             }
           )
@@ -158,7 +181,7 @@
       }
 
       function returnFileSelect() {
-        divMessage.textContent = '<?= text.import.fileSelected; ?>';
+        divMessage.textContent = '<?= DisplayTexts.import.FILE_SELECTED; ?>';
         inpFile.removeAttribute('disabled');
         inpLoadButton.removeAttribute('disabled');
         divChanges.setAttribute('hidden', true);
@@ -167,17 +190,17 @@
   </head>
   <body>
     <div class="main">
-      <h2><?= text.title; ?></h2>
+      <h2><?= DisplayTexts.TITLE; ?></h2>
       <div id="load">
         <input type="file" id="file" class="file" accept=".Dictionary,.Guides" />
-        <input type="button" id="loadButton" class="action" value="<?= text.import.loadButton; ?>" onclick="loadFile()" disabled="true" />
+        <input type="button" id="loadButton" class="action" value="<?= DisplayTexts.import.BUTTON_LOAD; ?>" onclick="loadFile()" disabled="true" />
       </div>
       <p><span id="loadSpan" hidden><svg id="loadSvg" width="1.0em" height="1.0em" xmlns="http://www.w3.org/2000/svg"></svg></span>
-        <span id="message"><?= text.import.initialMessage; ?></span></p>
+        <span id="message"><?= DisplayTexts.import.INITIAL_MESSAGE; ?></span></p>
       <div id="changes" hidden>
         <p>
-          <input type="button" id="executeButton" value="<?= text.import.executeButton; ?>" class="create" onclick="execute()" />
-          <input type="button" id="returnButton" value="<?= text.import.returnButton; ?>" onclick="returnFileSelect()" />
+          <input type="button" id="executeButton" value="<?= DisplayTexts.import.BUTTON_EXECUTE; ?>" class="create" onclick="execute()" />
+          <input type="button" id="returnButton" value="<?= DisplayTexts.import.BUTTON_RETURN; ?>" onclick="returnFileSelect()" />
         </p>
         <table id="diffTable"></table>
       </div>

@@ -2,7 +2,7 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8">
-    <title><?= text.title; ?></title>
+    <title><?= DisplayTexts.title; ?></title>
     <?!= HtmlService.createHtmlOutputFromFile('html/loader').getContent(); ?>
     <script type="text/javascript">
       window.onload = function() {
@@ -13,7 +13,7 @@
           .withSuccessHandler(
             function(content) {
               console.log('download data online');
-              if (fileType == '<?= FileType.dictionary; ?>' ) {
+              if (fileType == '<?= FileType.DICTIONARY; ?>' ) {
                 // prepend BOM only for Dictionary file
                 var blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]),
                                    content], {'type': 'text/plain'});
@@ -22,7 +22,7 @@
               }
               var fileName = '<?= getFileName(fileType, numbered, provisional); ?>';
               toggleAnimation('loadSpan', 'loadSvg');
-              document.getElementById('message').textContent = '<?= text.download.completed; ?>';
+              document.getElementById('message').textContent = '<?= DisplayTexts.download.COMPLETED; ?>';
               if (window.navigator.msSaveBlob) {
                 // IE or Edge
                 window.navigator.msSaveBlob(blob, filename);
@@ -43,7 +43,7 @@
           .withFailureHandler(
             function(content) {
               toggleAnimation('loadSpan', 'loadSvg');
-              document.getElementById('message').textContent = '<?= text.download.failed; ?>';
+              document.getElementById('message').textContent = '<?= DisplayTexts.download.FAILED; ?>';
             }
           )
           .getCsvData(fileType, '<?= numbered; ?>' == 'true', '<?= provisional; ?>' == 'true');
@@ -51,8 +51,8 @@
   </script>
   </head>
   <body>
-    <h2><?= text.title; ?></h2>
+    <h2><?= DisplayTexts.TITLE; ?></h2>
     <span id="loadSpan"><svg id="loadSvg" width="1.0em" height="1.0em" xmlns="http://www.w3.org/2000/svg"></svg></span>
-    <span id="message"><?= text.download.loading; ?></span>
+    <span id="message"><?= DisplayTexts.download.LOADING; ?></span>
   </body>
 </html>

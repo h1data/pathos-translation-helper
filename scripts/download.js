@@ -11,13 +11,13 @@ function getCsvData(fileType, numbered, provisional) {
   console.log('provisional', provisional);
   
   // choose function to generate data per line
-  if (fileType == FileType.dictionary) {
+  if (fileType == FileType.DICTIONARY) {
     if (provisional) {
       var buildFunction = buildDictionaryProvisional;
     } else {
       var buildFunction = buildDictionaryNormal;
     }
-  } else if (fileType == FileType.guides) {
+  } else if (fileType == FileType.GUIDES) {
     if (provisional) {
       var buildFunction = buildGuidesProvisional;
     } else {
@@ -27,7 +27,7 @@ function getCsvData(fileType, numbered, provisional) {
     throw 'invalid file type: ' + fileType;
   }
 
-  let sheetName = fileType == FileType.dictionary ? 'dictionarySheet' : 'guidesSheet';
+  let sheetName = fileType == FileType.DICTIONARY ? 'dictionarySheet' : 'guidesSheet';
   const spreadsheet = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('sheetID'))
                                     .getSheetByName(PropertiesService.getScriptProperties().getProperty(sheetName));
   
@@ -96,10 +96,10 @@ function getCsvData(fileType, numbered, provisional) {
  * @param {boolean} provisional 
  */
 function getFileName(fileType, numbered, provisional) {
-  if (fileType == FileType.dictionary) {
-    var fileName = dictionaryFileName;
-  } else if (fileType == FileType.guides) {
-    var fileName = guidesFileName;
+  if (fileType == FileType.DICTIONARY) {
+    var fileName = FILE_NAME_DICTIONARY;
+  } else if (fileType == FileType.GUIDES) {
+    var fileName = FILE_NAME_GUIDES;
   } else {
     throw 'invalid file type: ' + fileType;
   }

@@ -1,8 +1,8 @@
 // common constants
 /** file type (dictionary or guides) */
 const FileType = {
-  dictionary: 0,
-  guides: 1,
+  DICTIONARY: 0,
+  GUIDES: 1,
 }
 
 /**
@@ -36,9 +36,9 @@ function doGet(e){
     try {
       let htmlService = HtmlService.createTemplateFromFile('html/download.html');
       if (e.pathInfo.match(/download\/dictionary/)) {
-        htmlService.fileType = FileType.dictionary;
+        htmlService.fileType = FileType.DICTIONARY;
       } else if (e.pathInfo.match(/download\/guides/)) {
-        htmlService.fileType = FileType.guides;
+        htmlService.fileType = FileType.GUIDES;
       } else {
         console.error('illegal path', e.pathInfo);
       }
@@ -54,7 +54,7 @@ function doGet(e){
       }
       return htmlService.evaluate();
     } catch (exception) {
-      console.log(exception);
+      console.error(exception);
       return HtmlService.createTemplateFromFile('html/error.html').evaluate();
     }
   }
@@ -74,7 +74,7 @@ function doGet(e){
       }
       return htmlService.evaluate();
     } catch (exception) {
-      console.log(exception);
+      console.error(exception);
       return HtmlService.createTemplateFromFile('html/error.html').evaluate();
     }
   }

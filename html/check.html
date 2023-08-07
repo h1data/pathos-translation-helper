@@ -3,7 +3,7 @@
   <head>
     <base target="_top">
     <meta charset="utf-8">
-    <title><?= text.title; ?></title>
+    <title><?= DisplayTexts.TITLE; ?></title>
     <?!= HtmlService.createHtmlOutputFromFile('html/style').getContent(); ?>
     <?!= HtmlService.createHtmlOutputFromFile('html/loader').getContent(); ?>
     <script type="text/javascript">
@@ -16,13 +16,13 @@
               toggleAnimation('loadSpan', 'loadSvg');
               document.getElementById('result').hidden = false;
               if (data.size == 0) {
-                document.getElementById('message').textContent = '<?= text.check.noResult; ?>';
+                document.getElementById('message').textContent = '<?= DisplayTexts.check.NO_RESULT; ?>';
                 return;
               }
-              let table = document.getElementById('result-table-body');
-              for(let line of data) {
+              const table = document.getElementById('result-table-body');
+              for(const line of data) {
                 let tr = document.createElement('tr');
-                for(let column of line) {
+                for(const column of line) {
                   let td = document.createElement('td');
                   td.textContent = column;
                   tr.append(td);
@@ -33,13 +33,13 @@
                 }
                 table.append(tr);
               }
-              document.getElementById('message').textContent = '<?= text.check.normal; ?>';
+              document.getElementById('message').textContent = '<?= DisplayTexts.check.SUCCEEDED; ?>';
             }
           )
           .withFailureHandler(
             function(content) {
               toggleAnimation('loadSpan', 'loadSvg');
-              document.getElementById('message').textContent = '<?= text.check.failed; ?>';
+              document.getElementById('message').textContent = '<?= DisplayTexts.check.FAILED; ?>';
             }
           )
           .checkDuplicates('<?= provisional; ?>' == 'true');
@@ -47,18 +47,18 @@
     </script>
   </head>
   <body>
-    <h2><?= text.title; ?></h2>
-    <div id="provisional" hidden><?= text.check.provisional; ?></div>
+    <h2><?= DisplayTexts.TITLE; ?></h2>
+    <div id="provisional" hidden><?= DisplayTexts.check.PROVISIONAL; ?></div>
     <span id="loadSpan"><svg id="loadSvg" width="1.0em" height="1.0em" xmlns="http://www.w3.org/2000/svg"></svg></span>
-    <span id="message"><?= text.check.checking; ?></span>
+    <span id="message"><?= DisplayTexts.check.CHECKING; ?></span>
     <div id="result" hidden>
       <table id="result-table-head">
         <thead>
           <tr>
-            <th><?= text.check.headers[0]; ?></th>
-            <th><?= text.check.headers[1]; ?></th>
-            <th><?= text.check.headers[2]; ?></th>
-            <th><?= text.check.headers[3]; ?></th>
+            <th><?= DisplayTexts.tableHeaders.LINE_NUMBER; ?></th>
+            <th><?= DisplayTexts.tableHeaders.CONCEPT; ?></th>
+            <th><?= DisplayTexts.tableHeaders.ORIGINAL; ?></th>
+            <th><?= DisplayTexts.tableHeaders.TRANSLATION; ?></th>
           </tr>
         </thead>
         <tbody id="result-table-body"></tbody>
