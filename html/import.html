@@ -155,6 +155,9 @@
           if (diffData.length == 0) {
             divMessage.textContent = '<?= DisplayTexts.import.NO_CHANGE; ?>';
             inpFile.removeAttribute('disabled');
+            buttonGit.removeAttribute('disabled');
+            radioDictionary.removeAttribute('disabled');
+            radioGuides.removeAttribute('disabled');
             return;
           }
           let table = document.getElementById('diff-table');
