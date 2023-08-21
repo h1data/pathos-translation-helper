@@ -13,6 +13,7 @@ This helps Google Spreadsheet workflow for Pathos NetHack Codec translators.
   AppearanceName and ItemName are judged as the same concepts.<br>
   ![duplicate check](duplicateCheck.png)
 - Semi-auto import function for Dictionary and Guides files.<br>
+  Can check changes from both files or the official GitHub repository.<br>
   Deleted lines are not removed from spreadsheet automatically for safety, only changed background color.<br>
   ![import](import.png)
 
@@ -65,6 +66,7 @@ clasp clone [your script ID]
 
 In Google Apps Script web editor, enter your project and press the edit icon (gear wheel), and add script properties.
 - dictionarySheet: sheet name for contents of dictionary file in your spreadsheet.
+- gitRepo: GitHub repository path.
 - guidesSheet: sheet name for contents of guides file in your spreadsheet.
 - sheetID: sheet ID of your spreadsheet. You can see it in URL of spreadsheet like below.<br>
 `https://docs.google.com/spreadsheets/d/[your sheet ID]/edit#gid=xxxxx`
