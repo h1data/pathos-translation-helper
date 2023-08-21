@@ -8,12 +8,12 @@
     <?!= HtmlService.createHtmlOutputFromFile('html/loader').getContent(); ?>
     <script type="text/javascript">
       window.onload = function(){
-        toggleAnimation('loadSpan', 'loadSvg');
+        toggleAnimation('load-span', 'load-svg');
         if ('<?= provisional; ?>' === 'true') document.getElementById('provisional').hidden = false;
         google.script.run
           .withSuccessHandler(
             function (data) {
-              toggleAnimation('loadSpan', 'loadSvg');
+              toggleAnimation('load-span', 'load-svg');
               document.getElementById('result').hidden = false;
               if (data.size == 0) {
                 document.getElementById('message').textContent = '<?= DisplayTexts.check.NO_RESULT; ?>';
@@ -38,7 +38,7 @@
           )
           .withFailureHandler(
             function(content) {
-              toggleAnimation('loadSpan', 'loadSvg');
+              toggleAnimation('load-span', 'load-svg');
               document.getElementById('message').textContent = '<?= DisplayTexts.check.FAILED; ?>';
             }
           )
@@ -49,7 +49,7 @@
   <body>
     <h2><?= DisplayTexts.TITLE; ?></h2>
     <div id="provisional" hidden><?= DisplayTexts.check.PROVISIONAL; ?></div>
-    <span id="loadSpan"><svg id="loadSvg" width="1.0em" height="1.0em" xmlns="http://www.w3.org/2000/svg"></svg></span>
+    <span id="load-span"><svg id="load-svg" width="1.0em" height="1.0em" xmlns="http://www.w3.org/2000/svg"></svg></span>
     <span id="message"><?= DisplayTexts.check.CHECKING; ?></span>
     <div id="result" hidden>
       <table id="result-table-head">

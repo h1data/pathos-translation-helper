@@ -8,183 +8,237 @@
     <?!= HtmlService.createHtmlOutputFromFile('html/style').getContent(); ?>
     <?!= HtmlService.createHtmlOutputFromFile('html/loader').getContent(); ?>
     <script type="text/javascript">
-      var inpLoadButton;
-      var inpFile;
-      var inpExecute;
-      var inpReturn;
-      var divMessage;
-      var divChanges;
-      var fileType;
-      var diffData;
       window.onload = function() {
-        inpFile = document.getElementById('file');
-        inpFile.addEventListener('change', checkFileName, false);
-        inpExecute = document.getElementById('executeButton');
-        inpReturn = document.getElementById('returnButton');
-        inpLoadButton = document.getElementById('loadButton');
-        divMessage = document.getElementById('message');
-        divChanges = document.getElementById('changes');
-      }
-      function checkFileName() {
-        const selectedFile = inpFile.files[0];
-        if (selectedFile.name == '<?= FILE_NAME_DICTIONARY; ?>') {
-          fileType = <?= FileType.DICTIONARY; ?>;
-        } else if (selectedFile.name == '<?= FILE_NAME_GUIDES; ?>') {
-          fileType = <?= FileType.GUIDES; ?>;
-        } else {
-          divMessage.textContent = '<?= DisplayTexts.import.ILLEGAL_FILE_NAME; ?>';
-          return;
-        }
-        divMessage.textContent = '<?= DisplayTexts.import.FILE_SELECTED; ?>';
-        inpLoadButton.removeAttribute('disabled');
-      }
-      function loadFile() {
-        const selectedFile = inpFile.files[0];
-        inpFile.setAttribute('disabled', true);
-        inpLoadButton.setAttribute('disabled', true);
-        let fileReader = new FileReader();
-        fileReader.onload = function(e) {
+        var fileType;
+        var fileName;
+        var updateDate;
+        var diffData;
+
+        /** @type {HTMLInputElement} */
+        const inpFile = document.getElementById('file');
+        /** @type {HTMLInputElement} */
+        const buttonLoad = document.getElementById('button-load');
+        /** @type {HTMLInputElement} */
+        const buttonExecute = document.getElementById('button-execute');
+        /** @type {HTMLInputElement} */
+        const buttonGit = document.getElementById('button-git')
+        /** @type {HTMLInputElement} */
+        const buttonReturn = document.getElementById('button-return');
+        /** @type {HTMLDivElement} */
+        const divMessage = document.getElementById('message');
+        /** @type {HTMLDivElement} */
+        const divChanges = document.getElementById('changes');
+        /** @type {HTMLInputElement} */
+        const radioDictionary = document.getElementById('radio-dictionary');
+        /** @type {HTMLInputElement} */
+        const radioGuides = document.getElementById('radio-guides');
+
+        inpFile.addEventListener('change', function () {
+          const selectedFile = inpFile.files[0];
+          if (selectedFile.name == '<?= FILE_NAME_DICTIONARY; ?>') {
+            fileType = <?= FileType.DICTIONARY; ?>;
+          } else if (selectedFile.name == '<?= FILE_NAME_GUIDES; ?>') {
+            fileType = <?= FileType.GUIDES; ?>;
+          } else {
+            divMessage.textContent = '<?= DisplayTexts.import.ILLEGAL_FILE_NAME; ?>';
+            return;
+          }
+          divMessage.textContent = '<?= DisplayTexts.import.FILE_SELECTED; ?>';
+          fileName = selectedFile.name;
+          updateDate = selectedFile.lastModified;
+          buttonLoad.removeAttribute('disabled');
+        }, false);
+
+        buttonLoad.addEventListener('click', function () {
+          const selectedFile = inpFile.files[0];
+          inpFile.setAttribute('disabled', true);
+          buttonLoad.setAttribute('disabled', true);
+          buttonGit.setAttribute('disabled', true);
+          radioDictionary.setAttribute('disabled', true);
+          radioGuides.setAttribute('disabled', true);
+          let fileReader = new FileReader();
+          fileReader.onload = function(e) {
+            google.script.run
+              .withSuccessHandler(displayDiff)
+              .withFailureHandler(
+                function(error) {
+                  inpFile.removeAttribute('disabled');
+                  toggleAnimation('load-span', 'load-svg');
+                  divMessage.textContent = '<?= DisplayTexts.import.FAILED_LOAD_FILE; ?>';
+                }
+              )
+              .loadFile(selectedFile.name, e.target.result);
+          };
+          toggleAnimation('load-span', 'load-svg');
+          divMessage.textContent = '<?= DisplayTexts.import.LOADING; ?>';
+          fileReader.readAsText(selectedFile);
+        }, false);
+
+        buttonExecute.addEventListener('click',  function () {
+          toggleAnimation('load-span', 'load-svg');
+          divMessage.textContent = '<?= DisplayTexts.import.UPDATING; ?>';
+          buttonExecute.setAttribute('disabled', 'true');
+          buttonReturn.setAttribute('disabled', 'true');
+          
           google.script.run
-            .withSuccessHandler(displayDiff)
-            .withFailureHandler(
-              function(error) {
-                inpFile.removeAttribute('disabled');
-                toggleAnimation('loadSpan', 'loadSvg');
-                divMessage.textContent = '<?= DisplayTexts.import.FAILED_LOAD_FILE; ?>';
+            .withSuccessHandler(
+              function(arg) {
+                toggleAnimation('load-span', 'load-svg');
+                divMessage.textContent = '<?= DisplayTexts.import.UPDATED; ?>';
+                buttonReturn.removeAttribute('disabled');
               }
             )
-            .loadFile(selectedFile.name, e.target.result);
-        };
-        toggleAnimation('loadSpan', 'loadSvg');
-        divMessage.textContent = '<?= DisplayTexts.import.LOADING; ?>';
-        fileReader.readAsText(selectedFile);
-      }
+            .withFailureHandler(
+              function(arg) {
+                console.error(arg);
+                toggleAnimation('load-span', 'load-svg');
+                divMessage.textContent = '<?= DisplayTexts.import.FAILED_UPDATE; ?>';
+                buttonReturn.removeAttribute('disabled');
+                buttonGit.removeAttribute('disabled');
+              }
+            )
+            .applyData(fileType, diffData, updateDate);
+        }, false);
 
-      function displayDiff(arg) {
-        diffData = arg;
-        toggleAnimation('loadSpan', 'loadSvg');
-        if (diffData == -1) {
-          divMessage.textContent = '<?= DisplayTexts.import.ILLEGAL_FILE_FORMAT; ?>';
+        buttonGit.addEventListener('click',function () {
+          inpFile.setAttribute('disabled', true);
+          buttonLoad.setAttribute('disabled', true);
+          buttonGit.setAttribute('disabled', true);
+          radioDictionary.setAttribute('disabled', true);
+          radioGuides.setAttribute('disabled', true);
+          divMessage.textContent = '<?= DisplayTexts.import.LOADING; ?>';
+          toggleAnimation('load-span', 'load-svg');
+
+          fileType = document.getElementById('form-git').type.value;
+          google.script.run
+                      .withSuccessHandler(
+                        function(data) {
+                          updateDate = Date.parse(data.updateDate);
+                          displayDiff(data.diffContent);
+                        }
+                      )
+                      .withFailureHandler(
+                        function(error) {
+                          inpFile.removeAttribute('disabled');
+                          buttonGit.removeAttribute('disabled');
+                          radioDictionary.removeAttribute('disabled');
+                          radioGuides.removeAttribute('disabled');
+                          toggleAnimation('load-span', 'load-svg');
+                          divMessage.textContent = '<?= DisplayTexts.import.FAILED_LOAD_FILE; ?>';
+                        }
+                      )
+                      .checkGit(fileType);
+        }, false);
+
+        buttonReturn.addEventListener('click', function () {
           inpFile.removeAttribute('disabled');
-          return;
-        }
-        if (diffData.length == 0) {
-          divMessage.textContent = '<?= DisplayTexts.import.NO_CHANGE; ?>';
-          inpFile.removeAttribute('disabled');
-          return;
-        }
-        let table = document.getElementById('diffTable');
-        while (table.firstChild) {
-          table.removeChild(table.firstChild);
-        }
-        let tr = document.createElement('tr');
-        for (let i=0; i<5; i++) {
-          if (i == 2 && fileType == '<?= FileType.GUIDES ?>') continue;
-          let th = document.createElement('th');
-          switch (i) {
-            case 0:
-              th.textContent = '<?= DisplayTexts.tableHeaders.MOD; ?>';
-              break;
-            case 1:
-              th.textContent = '<?= DisplayTexts.tableHeaders.LINE_NUMBER; ?>';
-              break;
-            case 2:
-              th.textContent = '<?= DisplayTexts.tableHeaders.CONCEPT; ?>';
-              break;
-            case 3:
-              th.textContent = '<?= DisplayTexts.tableHeaders.ORIGINAL; ?>';
-              break;
-            case 4:
-              th.textContent = '<?= DisplayTexts.tableHeaders.TRANSLATION; ?>';
-              break;
+          if (inpFile.files.length > 0) {
+            divMessage.textContent = '<?= DisplayTexts.import.FILE_SELECTED; ?>';
+            buttonLoad.removeAttribute('disabled');
+          } else {
+            divMessage.textContent = '<?= DisplayTexts.import.INITIAL_MESSAGE; ?>';
           }
-          if (i == 1) {
-            th.setAttribute('colspan', 2);
-            th.classList.add('line');
+          buttonGit.removeAttribute('disabled');
+          radioDictionary.removeAttribute('disabled');
+          radioGuides.removeAttribute('disabled');
+          divChanges.setAttribute('hidden', true);
+        }, false);
+
+        function displayDiff(arg) {
+          diffData = arg;
+          toggleAnimation('load-span', 'load-svg');
+          if (diffData == -1) {
+            divMessage.textContent = '<?= DisplayTexts.import.ILLEGAL_FILE_FORMAT; ?>';
+            inpFile.removeAttribute('disabled');
+            return;
           }
-          tr.appendChild(th);
-        }
-        table.appendChild(tr);
-        
-        divChanges.removeAttribute('hidden');
-        for (const diff of diffData) {
+          if (diffData.length == 0) {
+            divMessage.textContent = '<?= DisplayTexts.import.NO_CHANGE; ?>';
+            inpFile.removeAttribute('disabled');
+            return;
+          }
+          let table = document.getElementById('diff-table');
+          while (table.firstChild) {
+            table.removeChild(table.firstChild);
+          }
           let tr = document.createElement('tr');
           for (let i=0; i<5; i++) {
-            let td = document.createElement('td');
+            if (i == 2 && fileType == '<?= FileType.GUIDES ?>') continue;
+            let th = document.createElement('th');
             switch (i) {
-              case 0: // mod
-                td.textContent = diff.mod;
-                if (diff.mod == '<?= DisplayTexts.import.ADD; ?>') {
-                  td.classList.add('red');
-                } else if (diff.mod == '<?= DisplayTexts.import.DEL; ?>') {
-                  td.classList.add('blue');
-                }
-                tr.appendChild(td);
+              case 0:
+                th.textContent = '<?= DisplayTexts.tableHeaders.MOD; ?>';
                 break;
-              case 1: // line number
-                td.textContent = diff.row;
-                td.classList.add('line');
-                if (diff.mod == '<?= DisplayTexts.import.ADD; ?>') {
-                  tr.appendChild(document.createElement('td'));
-                  tr.appendChild(td);
-                } else if (diff.mod == '<?= DisplayTexts.import.DEL; ?>') {
-                  tr.appendChild(td);
-                  tr.appendChild(document.createElement('td'));
-                }
+              case 1:
+                th.textContent = '<?= DisplayTexts.tableHeaders.LINE_NUMBER; ?>';
                 break;
-              case 2: // concept
-                if (fileType == '<?= FileType.DICTIONARY; ?>') {
-                  td.textContent = diff.concept;
-                  tr.appendChild(td);
-                }
+              case 2:
+                th.textContent = '<?= DisplayTexts.tableHeaders.CONCEPT; ?>';
                 break;
-              case 3: // original
-                td.textContent = diff.original;
-                tr.appendChild(td);
+              case 3:
+                th.textContent = '<?= DisplayTexts.tableHeaders.ORIGINAL; ?>';
                 break;
-              case 4: // translation
-                td.textContent = diff.translation;
-                tr.appendChild(td);
+              case 4:
+                th.textContent = '<?= DisplayTexts.tableHeaders.TRANSLATION; ?>';
                 break;
             }
+            if (i == 1) {
+              th.setAttribute('colspan', 2);
+              th.classList.add('line');
+            }
+            tr.appendChild(th);
           }
           table.appendChild(tr);
+          
+          divChanges.removeAttribute('hidden');
+          for (const diff of diffData) {
+            let tr = document.createElement('tr');
+            for (let i=0; i<5; i++) {
+              let td = document.createElement('td');
+              switch (i) {
+                case 0: // mod
+                  td.textContent = diff.mod;
+                  if (diff.mod == '<?= DisplayTexts.import.ADD; ?>') {
+                    td.classList.add('red');
+                  } else if (diff.mod == '<?= DisplayTexts.import.DEL; ?>') {
+                    td.classList.add('blue');
+                  }
+                  tr.appendChild(td);
+                  break;
+                case 1: // line number
+                  td.textContent = diff.row;
+                  td.classList.add('line');
+                  if (diff.mod == '<?= DisplayTexts.import.ADD; ?>') {
+                    tr.appendChild(document.createElement('td'));
+                    tr.appendChild(td);
+                  } else if (diff.mod == '<?= DisplayTexts.import.DEL; ?>') {
+                    tr.appendChild(td);
+                    tr.appendChild(document.createElement('td'));
+                  }
+                  break;
+                case 2: // concept
+                  if (fileType == '<?= FileType.DICTIONARY; ?>') {
+                    td.textContent = diff.concept;
+                    tr.appendChild(td);
+                  }
+                  break;
+                case 3: // original
+                  td.textContent = diff.original;
+                  tr.appendChild(td);
+                  break;
+                case 4: // translation
+                  td.textContent = diff.translation;
+                  tr.appendChild(td);
+                  break;
+              }
+            }
+            table.appendChild(tr);
+          }
+          divMessage.textContent = '<?= DisplayTexts.import.CONFIRM_DIFFERENCES; ?>' + ` (${new Date(updateDate).toLocaleDateString()})`;
+          buttonExecute.removeAttribute('disabled');
+          buttonReturn.removeAttribute('disabled');
         }
-        divMessage.textContent = '<?= DisplayTexts.import.CONFIRM_DIFFERENCES; ?>';
-        inpExecute.removeAttribute('disabled');
-        inpReturn.removeAttribute('disabled');
-      }
 
-      function execute() {
-        toggleAnimation('loadSpan', 'loadSvg');
-        divMessage.textContent = '<?= DisplayTexts.import.UPDATING; ?>';
-        inpExecute.setAttribute('disabled', 'true');
-        inpReturn.setAttribute('disabled', 'true');
-        const selectedFile = inpFile[0];
-        google.script.run
-          .withSuccessHandler(
-            function(arg) {
-              toggleAnimation('loadSpan', 'loadSvg');
-              divMessage.textContent = '<?= DisplayTexts.import.UPDATED; ?>';
-              inpReturn.removeAttribute('disabled');
-            }
-          )
-          .withFailureHandler(
-            function(arg) {
-              console.log(arg);
-              toggleAnimation('loadSpan', 'loadSvg');
-              divMessage.textContent = '<?= DisplayTexts.import.FAILED_UPDATE; ?>';
-              inpReturn.removeAttribute('disabled');
-            }
-          )
-          .applyData(fileType, diffData, inpFile.files[0].lastModified);
-      }
-
-      function returnFileSelect() {
-        divMessage.textContent = '<?= DisplayTexts.import.FILE_SELECTED; ?>';
-        inpFile.removeAttribute('disabled');
-        inpLoadButton.removeAttribute('disabled');
-        divChanges.setAttribute('hidden', true);
       }
     </script>
   </head>
@@ -192,17 +246,25 @@
     <div class="main">
       <h2><?= DisplayTexts.TITLE; ?></h2>
       <div id="load">
+        <?= DisplayTexts.import.GIT_MESSAGE; ?>
+        <form id="form-git">
+          <input id="radio-dictionary" type="radio" name="type" value="<?= FileType.DICTIONARY; ?>" checked>
+          <label for="radio-dictionary"><?= FILE_NAME_DICTIONARY; ?> </label>
+          <input id="radio-guides" type="radio" name="type" value="<?= FileType.GUIDES; ?>">
+          <label for="radio-guides"><?= FILE_NAME_GUIDES; ?> </label>
+          <input type="button" id="button-git" class="action" value="<?= DisplayTexts.import.BUTTON_GIT; ?>">
+        </form><br>
         <input type="file" id="file" class="file" accept=".Dictionary,.Guides" />
-        <input type="button" id="loadButton" class="action" value="<?= DisplayTexts.import.BUTTON_LOAD; ?>" onclick="loadFile()" disabled="true" />
+        <input type="button" id="button-load" class="action" value="<?= DisplayTexts.import.BUTTON_LOAD; ?>" disabled="true" />
       </div>
-      <p><span id="loadSpan" hidden><svg id="loadSvg" width="1.0em" height="1.0em" xmlns="http://www.w3.org/2000/svg"></svg></span>
+      <p><span id="load-span" hidden><svg id="load-svg" width="1.0em" height="1.0em" xmlns="http://www.w3.org/2000/svg"></svg></span>
         <span id="message"><?= DisplayTexts.import.INITIAL_MESSAGE; ?></span></p>
       <div id="changes" hidden>
         <p>
-          <input type="button" id="executeButton" value="<?= DisplayTexts.import.BUTTON_EXECUTE; ?>" class="create" onclick="execute()" />
-          <input type="button" id="returnButton" value="<?= DisplayTexts.import.BUTTON_RETURN; ?>" onclick="returnFileSelect()" />
+          <input type="button" id="button-execute" value="<?= DisplayTexts.import.BUTTON_EXECUTE; ?>" class="create" />
+          <input type="button" id="button-return" value="<?= DisplayTexts.import.BUTTON_RETURN; ?>" />
         </p>
-        <table id="diffTable"></table>
+        <table id="diff-table"></table>
       </div>
       <p class="secondary">Portions of this page are reproduced from work created and
         <a href="https://developers.google.com/terms/site-policies" target="_blank">shared by Google</a>

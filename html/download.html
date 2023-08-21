@@ -6,7 +6,7 @@
     <?!= HtmlService.createHtmlOutputFromFile('html/loader').getContent(); ?>
     <script type="text/javascript">
       window.onload = function() {
-        toggleAnimation('loadSpan', 'loadSvg');
+        toggleAnimation('load-span', 'load-svg');
         var fileType = '<?= fileType; ?>';
         // obtain CSV data via GAS
         google.script.run
@@ -21,10 +21,10 @@
                 var blob = new Blob([content], {'type': 'text/plain'});
               }
               var fileName = '<?= getFileName(fileType, numbered, provisional); ?>';
-              toggleAnimation('loadSpan', 'loadSvg');
+              toggleAnimation('load-span', 'load-svg');
               document.getElementById('message').textContent = '<?= DisplayTexts.download.COMPLETED; ?>';
               if (window.navigator.msSaveBlob) {
-                // IE or Edge
+                // IE or old Edge
                 window.navigator.msSaveBlob(blob, filename);
               } else {
                 var link = document.createElement('a');
@@ -42,7 +42,7 @@
           )
           .withFailureHandler(
             function(content) {
-              toggleAnimation('loadSpan', 'loadSvg');
+              toggleAnimation('load-span', 'load-svg');
               document.getElementById('message').textContent = '<?= DisplayTexts.download.FAILED; ?>';
             }
           )
@@ -52,7 +52,7 @@
   </head>
   <body>
     <h2><?= DisplayTexts.TITLE; ?></h2>
-    <span id="loadSpan"><svg id="loadSvg" width="1.0em" height="1.0em" xmlns="http://www.w3.org/2000/svg"></svg></span>
+    <span id="load-span"><svg id="load-svg" width="1.0em" height="1.0em" xmlns="http://www.w3.org/2000/svg"></svg></span>
     <span id="message"><?= DisplayTexts.download.LOADING; ?></span>
   </body>
 </html>

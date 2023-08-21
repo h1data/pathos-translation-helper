@@ -71,8 +71,7 @@ function loadFile(fileName, fileContents) {
       // 'a,"b, c", d' -> {'a', 'b, c', 'd'}
       columns = csvData[i].match(REG_DICTIONARY);
       if (columns.length < 2 || columns.length > 3) {
-        console.warn('illegal format', csvData[i], columns);
-        throw 'failed';
+        throw 'illegal format ' + JSON.stringify(columns);
       }
       for (let j=1; j<columns.length; j++) {
         // replace '""' to '""
@@ -164,7 +163,7 @@ function loadFile(fileName, fileContents) {
  * apply differences to spread sheet
  * @param {number} fileType referred to FileType
  * @param {Array} diffValues differential data
- * @param {number} epoch timpstamp of the file
+ * @param {number} epoch timestamp of the file
  */
 function applyData(fileType, diffValues, epoch) {
   if (fileType == FileType.DICTIONARY) {
@@ -213,4 +212,19 @@ function applyData(fileType, diffValues, epoch) {
       addOffset++;
     }
   }
+}
+
+/**
+ * 
+ * @param {number} fileType FileType
+ * @returns {Map<any>} updateDate, differential data
+ */
+function checkGit(fileType) {
+  const fileName = (fileType == FileType.DICTIONARY ? FILE_NAME_DICTIONARY : FILE_NAME_GUIDES);
+  const repoName = PropertiesService.getScriptProperties().getProperty('gitRepo');
+  let fetchURL = `https://api.github.com/repos/${repoName}/commits?path=Assets/${fileName}&per_page=1`;
+  const updateDate = JSON.parse(UrlFetchApp.fetch(fetchURL).getContentText())[0].commit.author.date;
+  fetchURL = `https://raw.githubusercontent.com/${repoName}/main/Assets/${fileName}`;
+  const response = UrlFetchApp.fetch(fetchURL).getContentText();
+  return {updateDate: updateDate, diffContent: loadFile(fileName, response.replace(/\n/g, '\r\n'))};
 }

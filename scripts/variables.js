@@ -5,7 +5,7 @@ const FILE_NAME_GUIDES = 'ja.Guides';
 
 /** message strings for web screens */ 
 const DisplayTexts = {
-  TITLE: 'Pathos 日本語 Translation Helper',
+  TITLE: '[TEST] Pathos 日本語 Translation Helper',
   download : {
     LOADING: 'データ作成中...',
     COMPLETED: 'データ作成が完了しました。このウィンドウは閉じても構いません。',
@@ -20,6 +20,8 @@ const DisplayTexts = {
   },
   import : {
     INITIAL_MESSAGE: 'ja.Dictionary または ja.Guides ファイルを選択し、読み込みボタンを押してください。',
+    LABEL_GIT: 'GitHubから取得',
+    BUTTON_GIT: 'チェック',
     BUTTON_LOAD: '読み込み',
     BUTTON_EXECUTE: '実行!!',
     BUTTON_RETURN: 'ファイル選択に戻る',
