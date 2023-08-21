@@ -20,7 +20,7 @@ function doGet(e){
     } else if (e.pathInfo.match(/check.*/)) {
       return createCheckPage(e);
     } else if (e.pathInfo.match(/import.*/)) {
-      return HtmlService.createTemplateFromFile('html/import.html').evaluate().setTitle(DisplayTexts.TITLE);;
+      return HtmlService.createTemplateFromFile('html/import.html').evaluate().setTitle(DisplayTexts.TITLE);
     } else {
       return HtmlService.createTemplateFromFile('html/error.html').evaluate();
     }
@@ -30,7 +30,7 @@ function doGet(e){
   }
 
   function createDownloadPage(e) {
-    let htmlTemplate = HtmlService.createTemplateFromFile('html/download.html').setTitle(DisplayTexts.TITLE);;
+    let htmlTemplate = HtmlService.createTemplateFromFile('html/download.html');
     if (e.pathInfo.match(/download\/dictionary/)) {
       htmlTemplate.fileType = FileType.DICTIONARY;
     } else if (e.pathInfo.match(/download\/guides/)) {
@@ -48,18 +48,18 @@ function doGet(e){
     } else {
       htmlTemplate.provisional = false;
     }
-    return htmlTemplate.evaluate();
+    return htmlTemplate.evaluate().setTitle(DisplayTexts.TITLE);
   }
 
   function createCheckPage(e) {
     try {
-      let htmlTemplate = HtmlService.createTemplateFromFile('html/check.html').setTitle(DisplayTexts.TITLE);;
+      let htmlTemplate = HtmlService.createTemplateFromFile('html/check.html');
       if (e.parameter.provisional != undefined) {
         htmlTemplate.provisional = e.parameter.provisional.toLowerCase() === 'true';
       } else {
         htmlTemplate.provisional = false;
       }
-      return htmlTemplate.evaluate();
+      return htmlTemplate.evaluate().setTitle(DisplayTexts.TITLE);
     } catch (exception) {
       console.error(exception);
       return HtmlService.createTemplateFromFile('html/error.html').evaluate();

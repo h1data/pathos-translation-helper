@@ -20,7 +20,7 @@
               } else {
                 var blob = new Blob([content], {'type': 'text/plain'});
               }
-              var fileName = '<?= getFileName(fileType, numbered, provisional); ?>';
+              var fileName = '<?= createDownloadFileName(fileType, numbered, provisional); ?>';
               toggleAnimation('load-span', 'load-svg');
               document.getElementById('message').textContent = '<?= DisplayTexts.download.COMPLETED; ?>';
               if (window.navigator.msSaveBlob) {
@@ -46,7 +46,7 @@
               document.getElementById('message').textContent = '<?= DisplayTexts.download.FAILED; ?>';
             }
           )
-          .getCsvData(fileType, '<?= numbered; ?>' == 'true', '<?= provisional; ?>' == 'true');
+          .createCsvData(fileType, '<?= numbered; ?>' == 'true', '<?= provisional; ?>' == 'true');
       }
   </script>
   </head>
