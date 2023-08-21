@@ -1,8 +1,8 @@
 // common constants
 /** file type (dictionary or guides) */
 const FileType = {
-  dictionary: 0,
-  guides: 1,
+  DICTIONARY: 0,
+  GUIDES: 1,
 }
 
 /**
@@ -15,10 +15,12 @@ function doGet(e){
   try {
     if (e.pathInfo.match(/download\/.+/)) {
       return createDownloadPage(e);
+    } else if (e.pathInfo.match(/file.*/)) {
+      // TODO
     } else if (e.pathInfo.match(/check.*/)) {
       return createCheckPage(e);
     } else if (e.pathInfo.match(/import.*/)) {
-      return HtmlService.createTemplateFromFile('html/import.html').evaluate();
+      return HtmlService.createTemplateFromFile('html/import.html').evaluate().setTitle(DisplayTexts.TITLE);
     } else {
       return HtmlService.createTemplateFromFile('html/error.html').evaluate();
     }
@@ -27,54 +29,39 @@ function doGet(e){
     return HtmlService.createTemplateFromFile('html/error.html').evaluate();
   }
 
-  /**
-   * Create HtmlService for download
-   * @param {Map} e Web app event parameters
-   * @returns {HtmlService} HtmlService object
-   */
   function createDownloadPage(e) {
-    try {
-      let htmlService = HtmlService.createTemplateFromFile('html/download.html');
-      if (e.pathInfo.match(/download\/dictionary/)) {
-        htmlService.fileType = FileType.dictionary;
-      } else if (e.pathInfo.match(/download\/guides/)) {
-        htmlService.fileType = FileType.guides;
-      } else {
-        console.error('illegal path', e.pathInfo);
-      }
-      if (e.parameter.numbered != undefined) {
-        htmlService.numbered = e.parameter.numbered.toLowerCase() === 'true';
-      } else {
-        htmlService.numbered = false;
-      }
-      if (e.parameter.provisional != undefined) {
-        htmlService.provisional = e.parameter.provisional.toLowerCase() === 'true';
-      } else {
-        htmlService.provisional = false;
-      }
-      return htmlService.evaluate();
-    } catch (exception) {
-      console.log(exception);
-      return HtmlService.createTemplateFromFile('html/error.html').evaluate();
+    let htmlTemplate = HtmlService.createTemplateFromFile('html/download.html');
+    if (e.pathInfo.match(/download\/dictionary/)) {
+      htmlTemplate.fileType = FileType.DICTIONARY;
+    } else if (e.pathInfo.match(/download\/guides/)) {
+      htmlTemplate.fileType = FileType.GUIDES;
+    } else {
+      console.error('illegal path', e.pathInfo);
     }
+    if (e.parameter.numbered != undefined) {
+      htmlTemplate.numbered = e.parameter.numbered.toLowerCase() === 'true';
+    } else {
+      htmlTemplate.numbered = false;
+    }
+    if (e.parameter.provisional != undefined) {
+      htmlTemplate.provisional = e.parameter.provisional.toLowerCase() === 'true';
+    } else {
+      htmlTemplate.provisional = false;
+    }
+    return htmlTemplate.evaluate().setTitle(DisplayTexts.TITLE);
   }
 
-  /**
-   * Create HtmlService for check function
-   * @param {Map} e Web app event parameters
-   * @returns {HtmlService} HtmlService object
-   */
   function createCheckPage(e) {
     try {
-      let htmlService = HtmlService.createTemplateFromFile('html/check.html');
+      let htmlTemplate = HtmlService.createTemplateFromFile('html/check.html');
       if (e.parameter.provisional != undefined) {
-        htmlService.provisional = e.parameter.provisional.toLowerCase() === 'true';
+        htmlTemplate.provisional = e.parameter.provisional.toLowerCase() === 'true';
       } else {
-        htmlService.provisional = false;
+        htmlTemplate.provisional = false;
       }
-      return htmlService.evaluate();
+      return htmlTemplate.evaluate().setTitle(DisplayTexts.TITLE);
     } catch (exception) {
-      console.log(exception);
+      console.error(exception);
       return HtmlService.createTemplateFromFile('html/error.html').evaluate();
     }
   }
