@@ -5,19 +5,19 @@
  * @param {boolean} provisional 
  * @returns {string} contents for download data
  */ 
-function getCsvData(fileType, numbered, provisional) {
+function createCsvData(fileType, numbered, provisional) {
   console.log('fileType', fileType);
   console.log('numbered', numbered);
   console.log('provisional', provisional);
   
   // choose function to generate data per line
-  if (fileType == FileType.dictionary) {
+  if (fileType == FileType.DICTIONARY) {
     if (provisional) {
       var buildFunction = buildDictionaryProvisional;
     } else {
       var buildFunction = buildDictionaryNormal;
     }
-  } else if (fileType == FileType.guides) {
+  } else if (fileType == FileType.GUIDES) {
     if (provisional) {
       var buildFunction = buildGuidesProvisional;
     } else {
@@ -27,16 +27,15 @@ function getCsvData(fileType, numbered, provisional) {
     throw 'invalid file type: ' + fileType;
   }
 
-  let sheetName = fileType == FileType.dictionary ? 'dictionarySheet' : 'guidesSheet';
-  const spreadsheet = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('sheetID'))
-                                    .getSheetByName(PropertiesService.getScriptProperties().getProperty(sheetName));
-  
-  var inputArray = spreadsheet.getDataRange().getValues();
-  var outputArray = [];
-  // line 1 is the header thus loop begins from line 2 (i=0)
-  for (let i = 1; i < inputArray.length; i++) {
-    buildFunction(inputArray[i], outputArray);
-  }
+  let sheetName = (fileType == FileType.DICTIONARY) ? 'dictionarySheet' : 'guidesSheet';
+  const inputArray = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('sheetID'))
+                                   .getSheetByName(PropertiesService.getScriptProperties().getProperty(sheetName))
+                                   .getDataRange()
+                                   .getValues();
+  const outputArray = [];
+  // remove the header line
+  inputArray.shift();
+  inputArray.forEach((line) => { buildFunction(line, outputArray) });
   return outputArray.join('\r\n').concat('\r\n');
 
   function buildDictionaryNormal(inputArray, outputArray) {
@@ -95,11 +94,11 @@ function getCsvData(fileType, numbered, provisional) {
  * @param {boolean} numbered 
  * @param {boolean} provisional 
  */
-function getFileName(fileType, numbered, provisional) {
-  if (fileType == FileType.dictionary) {
-    var fileName = dictionaryFileName;
-  } else if (fileType == FileType.guides) {
-    var fileName = guidesFileName;
+function createDownloadFileName(fileType, numbered, provisional) {
+  if (fileType == FileType.DICTIONARY) {
+    var fileName = FILE_NAME_DICTIONARY;
+  } else if (fileType == FileType.GUIDES) {
+    var fileName = FILE_NAME_GUIDES;
   } else {
     throw 'invalid file type: ' + fileType;
   }
