@@ -102,7 +102,7 @@ provisional: if true, check with provisional mode; the original words (column C)
 `https://script.google.com/macros/s/[your deployment id]/exec/import`
 
 ## Miscellaneous info
-- [Pathos NetHack Codec](https://pathos.azurewebsites.net/)
+- [Pathos NetHack Codex](https://pathos.azurewebsites.net/)
 - Portions of this page are reproduced from work created and
 [shared by Google](https://developers.google.com/terms/site-policies)<br>
 and used according to terms described in the [Creative Commons 4.0 Attribution License](https://creativecommons.org/licenses/by/4.0/). 
