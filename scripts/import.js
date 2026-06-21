@@ -221,10 +221,22 @@ function applyData(fileType, diffValues, epoch) {
  */
 function checkGit(fileType) {
   const fileName = (fileType == FileType.DICTIONARY ? FILE_NAME_DICTIONARY : FILE_NAME_GUIDES);
-  const repoName = PropertiesService.getScriptProperties().getProperty('gitRepo');
+  const repoName = getScriptProperty('gitRepo');
+  const token = getScriptProperty('gitToken');
+
   let fetchURL = `https://api.github.com/repos/${repoName}/commits?path=Assets/${fileName}&per_page=1`;
-  const updateDate = JSON.parse(UrlFetchApp.fetch(fetchURL).getContentText())[0].commit.author.date;
+  const updateDate = JSON.parse(
+    UrlFetchApp.fetch(
+      fetchURL,
+      { headers: { "Authorization": `Bearer ${token}` } }
+    ).getContentText())[0].commit.author.date;
   fetchURL = `https://raw.githubusercontent.com/${repoName}/main/Assets/${fileName}`;
   const response = UrlFetchApp.fetch(fetchURL).getContentText();
   return {updateDate: updateDate, diffContent: loadFile(fileName, response.replace(/\n/g, '\r\n'))};
+
+  function getScriptProperty(key) {
+    const value = PropertiesService.getScriptProperties().getProperty(key);
+    if (value == null) throw new Error(`Script Property "${key}" is not defined!`);
+    return value;
+  }
 }
