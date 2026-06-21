@@ -62,18 +62,24 @@ And then fetch the local directory to the WEB project.
 clasp clone [your script ID]
 ```
 
-### 6. Configure script properties
+### 6. Create Personal Access Token on GitHub
+
+To retrieve information from the official GitHub repository via API, you need personal access token on GitHub.<br>
+See [Creating a fine-grained personal access token](https://docs.github.com/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens?versionId=free-pro-team%40latest&productId=get-started&restPage=writing-on-github%2Cgetting-started-with-writing-and-formatting-on-github%2Cbasic-writing-and-formatting-syntax#creating-a-fine-grained-personal-access-token) on GitHub Docs.
+
+### 7. Configure script properties
 
 In Google Apps Script web editor, enter your project and press the edit icon (gear wheel), and add script properties.
-- dictionarySheet: sheet name for contents of dictionary file in your spreadsheet.
-- gitRepo: GitHub repository path.
-- guidesSheet: sheet name for contents of guides file in your spreadsheet.
-- sheetID: sheet ID of your spreadsheet. You can see it in URL of spreadsheet like below.<br>
+- `dictionarySheet`: sheet name for contents of dictionary file in your spreadsheet.
+- `gitRepo`: GitHub repository path.
+- `gitToken`: GitHub personal access token secret obtained in [6. Create Personal Access Token on GitHub](#6-create-personal-access-token-on-github)
+- `guidesSheet`: sheet name for contents of guides file in your spreadsheet.
+- `sheetID`: sheet ID of your spreadsheet. You can see it in URL of spreadsheet like below.<br>
 `https://docs.google.com/spreadsheets/d/[your sheet ID]/edit#gid=xxxxx`
 
 ![scriptProperties.png](scriptProperties.png)
 
-### 7. Tune scripts
+### 8. Tune scripts
 At least, you have to modify scripts/variables.js for translation filenames of your language.
 ```JavaScript
 // file names
@@ -81,13 +87,18 @@ const dictionaryFileName = 'ja.Dictionary';
 const guidesFileName = 'ja.Guides';
 ```
 
-### 8. Deploy scripts as Web Service
+### 9. Deploy scripts as Web Service
 ```
 clasp push
 clasp deploy -d [your deploy id]
 ```
+> [!NOTE]
+> When updating the deployment, you can deploy without changing web service URL by;
+> ```
+> clasp redeploy -d [your deploy id]
+> ```
 
-### 9. Add embed links of the script to the spreadsheet
+### 10. Add embed links of the script to the spreadsheet
 - File downloader<br>
 `https://script.google.com/macros/s/[your deployment id/exec/download/[fileType]?provisional=false&numbered=false`<br>
 [fileType]: `dictionary` or `guides`<br>
