@@ -215,7 +215,7 @@ function applyData(fileType, diffValues, epoch) {
 }
 
 /**
- * 
+ * import contents from GitHub
  * @param {number} fileType FileType
  * @returns {Map<any>} updateDate, differential data
  */
@@ -228,10 +228,25 @@ function checkGit(fileType) {
   const updateDate = JSON.parse(
     UrlFetchApp.fetch(
       fetchURL,
-      { headers: { "Authorization": `Bearer ${token}` } }
+      {
+        headers: {
+          "Accept": "application/vnd.github+json",
+          "Authorization": `Bearer ${token}`,
+          "X-GitHub-Api-Version": "2026-03-10"
+        }
+      }
     ).getContentText())[0].commit.author.date;
-  fetchURL = `https://raw.githubusercontent.com/${repoName}/main/Assets/${fileName}`;
-  const response = UrlFetchApp.fetch(fetchURL).getContentText();
+  fetchURL = `https://api.github.com/repos/${repoName}/contents/Assets/${fileName}?ref=main`;
+  const response = UrlFetchApp.fetch(
+    fetchURL,
+    {
+      headers: {
+        "Accept": "application/vnd.github.raw+json",
+        "Authorization": `Bearer ${token}`,
+        "X-GitHub-Api-Version": "2026-03-10"
+      }
+    }
+  ).getContentText();
   return {updateDate: updateDate, diffContent: loadFile(fileName, response.replace(/\n/g, '\r\n'))};
 
   function getScriptProperty(key) {
