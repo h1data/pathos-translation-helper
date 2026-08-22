@@ -114,6 +114,7 @@ provisional: if true, check with provisional mode; the original words (column C)
 
 ## Miscellaneous info
 - [Pathos NetHack Codex](https://pathos.azurewebsites.net/)
+- [Official repository including dictionary files](https://github.com/callanh/pathos-official)
 - Portions of this page are reproduced from work created and
 [shared by Google](https://developers.google.com/terms/site-policies)<br>
 and used according to terms described in the [Creative Commons 4.0 Attribution License](https://creativecommons.org/licenses/by/4.0/). 
