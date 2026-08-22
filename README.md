@@ -90,12 +90,12 @@ const guidesFileName = 'ja.Guides';
 ### 9. Deploy scripts as Web Service
 ```
 clasp push
-clasp deploy -d [your deploy id]
+clasp deploy -d "deploy description" [your deploy id]
 ```
 > [!NOTE]
 > When updating the deployment, you can deploy without changing web service URL by;
 > ```
-> clasp redeploy -d [your deploy id]
+> clasp redeploy -d "deploy description" [your deploy id]
 > ```
 
 ### 10. Add embed links of the script to the spreadsheet
